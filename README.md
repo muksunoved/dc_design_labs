@@ -1,2 +1,3 @@
-# Data center design labs
-Data center design labs
+### Лабораторные работы по курсу дизайн сетей ЦОД
+
+[[Установка netlab с менеджером containerlab]]
