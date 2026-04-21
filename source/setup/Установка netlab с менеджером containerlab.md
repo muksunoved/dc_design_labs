@@ -151,7 +151,8 @@ clab-testing2-r2
 $ sudo ip netns exec clab-testing2-r1 tcpdump -vvi et1 -w ./out.pcap
 ```
 Полученный файл открываем в `wireshark`
-![[test-pcap-wireshark.png]]
+![screenshot](images/test-pcap-wireshark.png)
+
 
 
 
@@ -162,7 +163,7 @@ $ netlab graph
 $ dot graph.dot -T png -o test-topo.png
 ```
 
-![[test-topo.png]]
+![screenshot](images/test-topo.png)
 
 Подробнее см. : https://blog.ipspace.net/2021/09/netsim-tools-graphs/
 
