@@ -2,7 +2,7 @@
 ---
 
 - [Установка netlab с менеджером containerlab](source/setup/README.md)
-- [Практическая работа 1 - Основы проектирования сети](source/lab_1/README.md)
+- [Практическая работа 1 - Основы проектирования сети](source/lab_01/README.md)
 
 ---
 
