@@ -1,5 +1,9 @@
 ### Лабораторные работы по курсу дизайн сетей ЦОД
+---
 
-[Установка netlab с менеджером containerlab](source/setup/Установка%20netlab%20с%20менеджером%20containerlab.md)
+[Установка netlab с менеджером containerlab](source/setup/README.md)
+[Практическая работа 1 - Основы проектирования сети](source/lab_1/README.md)
+
+---
 
 

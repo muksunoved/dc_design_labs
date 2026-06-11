@@ -1,4 +1,4 @@
-
+### Установка netlab с менеджером containerlab
 #### Установка для Ubuntu 24.04
 
 Самый простой вариант (ubuntu 24.04):
@@ -11,10 +11,10 @@ $ pipx install networklab
 ```shell
 $ netlab install containerlab
 ```
-При установке будет в систему будет установлен docker.
-Текущий пользователь будет добавлен в группу docker. Поэтому потребуется перелогинится или перезагрузиться.
+При установке в систему будет установлен Docker.
+Текущий пользователь будет добавлен в группу docker, поэтому потребуется перелогиниться или перезагрузиться.
 
-При необходимости можно доапгрейдить пакет до последней версии (в окументации написано что тестировался с версией 0.72.0):
+При необходимости можно обновить пакет до последней версии (в документации написано, что тестировался с версией 0.72.0):
 ```shell
 $ sudo containerlab version upgrade
 ...
@@ -43,9 +43,15 @@ $ netlab show images
 ```
 
 ##### Установка `ansible`
-`Netlab` требует определенной версии, поэтому если в системе уже установлен `ansible` следует его удалить и установить командой:
+
+`Netlab` требует определённую версию `ansible`, поэтому если в системе уже установлен `ansible`, следует его удалить и установить командой:
 ```shell
 $ netlab install ansible
+```
+
+Остальные зависимости, которые могут понадобиться:
+```
+$ netlab install ubuntu
 ```
 
 ##### Установка визуализации
@@ -54,18 +60,20 @@ $ netlab install graph
 ```
 
 ##### Установка контейнера `Arista cEOS` для `containerlab`
-Качаем контейнер с сайта: https://www.arista.com/en/support/software-download
-Для регистрации потребуется корпоративный почтовый ящик и доступ не из зоны RU.
-Распаковываем и устанавливаем:
+
+Скачайте контейнер с сайта: https://www.arista.com/en/support/software-download
+Для регистрации потребуется корпоративный почтовый ящик.
+
+Распакуйте и установите:
 ```shell
 $ docker image import <tar-filename> <tag>
 
-пример
+пример:
 $ docker image import ./cEOS-lab-4.34.2.2F.tar ceos:4.34.2.2F
 ```
 
 ##### Подготовка тестового запуска
-Создать каталог для лабы и поместить туда файл с содержанием (для версии контейнера из примера):
+Создайте каталог для лабораторной работы и поместите туда файл со следующим содержимым (для версии контейнера из примера):
 ```yaml
 ---
 provider: clab
@@ -86,35 +94,46 @@ links:
   r2:
   ospf:
     area: 0.0.0.1
+
 ```
 
-Необходимо изменить системные переменные `sysctl`:
+Скопируйте приведенный выше пример в файл `topology.yml` и поместите его в отдельный каталог.
+
+Необходимо изменить системные параметры `sysctl`:
 ```
 $ sudo sysctl net.bridge.bridge-nf-call-ip6tables=0
 $ sudo sysctl net.bridge.bridge-nf-call-iptables=0
 $ sudo sysctl net.bridge.bridge-nf-call-arptables=0
 ```
 
-В этом же каталоге выполняем запуск лабы:
+В этом же каталоге выполните запуск лабораторной работы:
 ```shell
 $ netlab up
 
-или, если требуется более подробный вывод
+или, если требуется более подробный вывод загрузки
 
 $ netlab up -vv
 ```
-Если запуск прошел успешно увидим в консоли:
+
+Если запуск прошёл успешно, в консоли будет выведено:
 ```shell
 [SUCCESS] Lab devices configured
 ```
-Далее можно посмотреть трафик для ноды `r1` или `r2`:
+
+Проверьте статусы (должна вывестись таблица с нодами):
+```
+$ netlab status
+```
+![image](images/netlab-status.png)
+
+Далее можно просмотреть трафик для ноды `r1` или `r2`:
 ```shell
 $ netlab capture r1 Ethernet1
 $ netlab capture r2 Ethernet1
 
 ```
 
-Примерный вывод (видим анонсы `OSPF` и `LLDP`):
+Пример вывода (видны анонсы `OSPF` и `LLDP`):
 ```shell
 Starting packet capture on r1/et1: sudo ip netns exec clab-testing2-r1 tcpdump -i et1 --immediate-mode -l -vv
 tcpdump: listening on et1, link-type EN10MB (Ethernet), snapshot length 262144 bytes
@@ -138,26 +157,25 @@ tcpdump: listening on et1, link-type EN10MB (Ethernet), snapshot length 262144 b
 	  0x0000:  0400 1c73 18d3 4d
 ```
 
-Также можно записать файл для wireshark: 
-Смотрим какие ноды присутствуют:
+Также можно записать файл для Wireshark.
+Посмотрите, какие ноды присутствуют:
 ```shell
 $ ip netns list
 ...
 clab-testing2-r1
 clab-testing2-r2
 ```
-Запускаем для выбранной ноды (см. вывод из консоли выше для команды `netlink capture`):
+
+Запустите для выбранной ноды (см. вывод из консоли выше для команды `netlab capture`):
 ```shell
 $ sudo ip netns exec clab-testing2-r1 tcpdump -vvi et1 -w ./out.pcap
 ```
-Полученный файл открываем в `wireshark`
+
+Полученный файл откройте в `Wireshark`:
 ![screenshot](images/test-pcap-wireshark.png)
 
 
-
-
-
-Сформируем картинку с топологией:
+Сформируйте изображение с топологией:
 ```shell
 $ netlab graph
 $ dot graph.dot -T png -o test-topo.png
@@ -165,9 +183,9 @@ $ dot graph.dot -T png -o test-topo.png
 
 ![screenshot](images/test-topo.png)
 
-Подробнее см. : https://blog.ipspace.net/2021/09/netsim-tools-graphs/
+Подробнее см.: https://blog.ipspace.net/2021/09/netsim-tools-graphs/
 
-Остановка лабы:
+Остановите лабораторную работу:
 ```shell
 $ netlab down
 ```
