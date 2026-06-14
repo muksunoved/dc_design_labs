@@ -1,0 +1,10 @@
+{# BFD Configuration Template for OSPF #}
+{# Enable BFD on all interfaces and in OSPF process #}
+
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  bfd interval 100 min_rx 100 multiplier 3
+!
+{% endfor %}
+router ospf 1
+  bfd default
