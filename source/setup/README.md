@@ -215,6 +215,11 @@ sudo ip netns exec clab-testing2-r1 tcpdump -i et1 -U -w - | wireshark -k -i -
 $ ssh clab-testing2-r1
 $ ssh clab-testing2-r2
 ```
+Или можно воспользоваться командами netlab:
+```
+$ netlab connect r1
+$ netlab connect r2
+```
 
 ##### Создание графической схемы топологии
 

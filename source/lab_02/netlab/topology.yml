@@ -8,6 +8,12 @@ defaults:
     eos:
       clab:
         image: "ceos:4.34.2.2F"
+  outputs:
+    graph:
+      interface_labels: True
+      styles:
+        graph:
+          splines: line
 
 plugin: [files]
 
@@ -16,26 +22,51 @@ nodes:
     loopback:
       ipv4: 10.0.1.1/32
     config: [spine, ospf-timers, bfd]
+    graph:
+      format:
+        image: "spine.png"
+        shape: "none"
+        labelloc: "b"
 
   spine2:
     loopback:
       ipv4: 10.0.2.1/32
     config: [spine, ospf-timers, bfd]
+    graph:
+      format:
+        image: "spine.png"
+        shape: "none"
+        labelloc: "b"
 
   leaf1:
     loopback:
       ipv4: 10.0.11.1/32
     config: [leaf, ospf-timers, bfd]
+    graph:
+      format:
+        image: "leaf.png"
+        shape: "none"
+        labelloc: "b"
 
   leaf2:
     loopback:
       ipv4: 10.0.12.1/32
     config: [leaf, ospf-timers, bfd]
+    graph:
+      format:
+        image: "leaf.png"
+        shape: "none"
+        labelloc: "b"
 
   leaf3:
     loopback:
       ipv4: 10.0.13.1/32
     config: [leaf, ospf-timers, bfd]
+    graph:
+      format:
+        image: "leaf.png"
+        shape: "none"
+        labelloc: "b"
 
 links:
   # Spine1 <-> Leaf1-3
@@ -43,24 +74,42 @@ links:
       ipv4: 10.2.1.0/31
     leaf1:
       ipv4: 10.2.1.1/31
+    graph:
+      format:
+        label: "10.2.1.0/31"
   - spine1:
       ipv4: 10.2.1.2/31
     leaf2:
       ipv4: 10.2.1.3/31
+    graph:
+      format:
+        label: "10.2.1.2/31"
   - spine1:
       ipv4: 10.2.1.4/31
     leaf3:
       ipv4: 10.2.1.5/31
+    graph:
+      format:
+        label: "10.2.1.4/31"
   # Spine2 <-> Leaf1-3
   - spine2:
       ipv4: 10.2.2.0/31
     leaf1:
       ipv4: 10.2.2.1/31
+    graph:
+      format:
+        label: "10.2.2.0/31"
   - spine2:
       ipv4: 10.2.2.2/31
     leaf2:
       ipv4: 10.2.2.3/31
+    graph:
+      format:
+        label: "10.2.2.2/31"
   - spine2:
       ipv4: 10.2.2.4/31
     leaf3:
       ipv4: 10.2.2.5/31
+    graph:
+      format:
+        label: "10.2.2.4/31"
