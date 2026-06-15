@@ -1,0 +1,9 @@
+{# OSPF Timer Configuration Template #}
+{# Configure OSPF hello and dead intervals on interfaces #}
+
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  ip ospf hello-interval 3
+  ip ospf dead-interval 10
+!
+{% endfor %}
