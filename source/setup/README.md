@@ -225,8 +225,7 @@ $ netlab connect r2
 
 Сформируйте изображение с топологией:
 ```shell
-$ netlab graph
-$ dot graph.dot -T png -o test-topo.png
+$ netlab graph topo_labeled.png
 ```
 
 ![screenshot](images/test-topo.png)
