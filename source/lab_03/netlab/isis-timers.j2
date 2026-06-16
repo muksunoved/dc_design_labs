@@ -1,0 +1,9 @@
+{# IS-IS Timer Configuration Template #}
+{# Configure IS-IS hello intervals on interfaces #}
+
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  isis hello-interval 3
+  isis hello-multiplier 3
+!
+{% endfor %}

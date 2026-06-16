@@ -1,0 +1,11 @@
+{# BFD Configuration Template for IS-IS #}
+{# Enable BFD on all interfaces and in IS-IS process #}
+
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  bfd interval 100 min_rx 100 multiplier 3
+!
+{% endfor %}
+router isis CORE
+  address-family ipv4 unicast
+    bfd all-interfaces
