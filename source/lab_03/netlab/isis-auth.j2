@@ -1,0 +1,10 @@
+{# IS-IS MD5 Authentication Template - inline key format #}
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  isis authentication mode md5
+  isis authentication key 7 2D47C661223B3ACF6B2107446E6BAC3E55
+!
+{% endfor %}
+router isis CORE
+  authentication mode md5
+  authentication key 7 2D47C661223B3ACF6B2107446E6BAC3E55

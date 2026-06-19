@@ -1,0 +1,32 @@
+# Netlab CLOS Topology: 2 Spine + 3 Leaf
+# Provider: containerlab | Device: Arista EOS
+# IP addresses are loaded from ip-plan.yml by the ipplan plugin.
+
+defaults:
+  device: eos
+  provider: clab
+  devices:
+    eos:
+      clab:
+        image: "ceos:4.34.2.2F"
+  outputs:
+    graph:
+      interface_labels: True
+
+plugin: [files, ipplan]
+
+nodes:
+  spine1:
+    config: [spine, isis-timers, isis-auth, bfd]
+
+  spine2:
+    config: [spine, isis-timers, isis-auth, bfd]
+
+  leaf1:
+    config: [leaf, isis-timers, isis-auth, bfd]
+
+  leaf2:
+    config: [leaf, isis-timers, isis-auth, bfd]
+
+  leaf3:
+    config: [leaf, isis-timers, isis-auth, bfd]

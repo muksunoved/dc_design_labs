@@ -1,0 +1,23 @@
+{# Generate NET from loopback IP: 49.0001.XXXX.XXXX.XXXX.00 #}
+{% set lo0_full = loopback.ipv4 | replace('/32', '') %}
+{% set lo0_parts = lo0_full.split('.') %}
+{# Build system ID from loopback IP: pad each octet to 3 digits, group as 4-4-4 #}
+{% set sys_parts = lo0_parts | map('int') | list %}
+{% set sys_id = '%03d%03d%03d%03d' | format(sys_parts[0], sys_parts[1], sys_parts[2], sys_parts[3]) %}
+{% set net_addr = '49.0001.%s.%s.%s.00' | format(sys_id[0:4], sys_id[4:8], sys_id[8:12]) %}
+!
+interface Loopback0
+  ip address {{ loopback.ipv4 }}
+  isis enable CORE
+!
+{% for intf in interfaces %}
+interface {{ intf.ifname }}
+  isis enable CORE
+  isis network point-to-point
+!
+{% endfor %}
+router isis CORE
+  net {{ net_addr }}
+  is-type level-2
+  address-family ipv4 unicast
+    maximum-paths 4
