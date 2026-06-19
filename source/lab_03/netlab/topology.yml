@@ -1,11 +1,10 @@
-# Netlab CLOS Topology: 2 Spine + 3 Leaf with IS-IS
+# Netlab CLOS Topology: 2 Spine + 3 Leaf
 # Provider: containerlab | Device: Arista EOS
 # IP addresses are loaded from ip-plan.yml by the ipplan plugin.
 
 defaults:
   device: eos
   provider: clab
-  module: [isis]
   devices:
     eos:
       clab:
@@ -13,49 +12,21 @@ defaults:
   outputs:
     graph:
       interface_labels: True
-      styles:
-        graph:
-          splines: line
 
 plugin: [files, ipplan]
 
 nodes:
   spine1:
-    config: [spine, isis-timers, bfd]
-    graph:
-      format:
-        image: "spine.png"
-        shape: "none"
-        labelloc: "b"
+    config: [spine, isis-timers, isis-auth, bfd]
 
   spine2:
-    config: [spine, isis-timers, bfd]
-    graph:
-      format:
-        image: "spine.png"
-        shape: "none"
-        labelloc: "b"
+    config: [spine, isis-timers, isis-auth, bfd]
 
   leaf1:
-    config: [leaf, isis-timers, bfd]
-    graph:
-      format:
-        image: "leaf.png"
-        shape: "none"
-        labelloc: "b"
+    config: [leaf, isis-timers, isis-auth, bfd]
 
   leaf2:
-    config: [leaf, isis-timers, bfd]
-    graph:
-      format:
-        image: "leaf.png"
-        shape: "none"
-        labelloc: "b"
+    config: [leaf, isis-timers, isis-auth, bfd]
 
   leaf3:
-    config: [leaf, isis-timers, bfd]
-    graph:
-      format:
-        image: "leaf.png"
-        shape: "none"
-        labelloc: "b"
+    config: [leaf, isis-timers, isis-auth, bfd]
