@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Netlab generated artifacts (per-lab)
+netlab.lock
+netlab.snapshot.pickle
+group_vars/
+host_vars/
+node_files/
+
+# Robot Framework output files
+output.xml
+log.html
+report.html
+
+# Qwen Code
+.qwen/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

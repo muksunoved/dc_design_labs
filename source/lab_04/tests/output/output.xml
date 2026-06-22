@@ -1,0 +1,3384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.4.2 (Python 3.12.3 on linux)" generated="2026-06-22T17:51:35.364077" rpa="false" schemaversion="5">
+<suite id="s1" name="Test Ebgp" source="/home/linadmin/work/dc_design_labs/source/lab_04/tests/test_ebgp.robot">
+<test id="s1-t1" name="Lab Should Start Successfully" line="28">
+<kw name="Netlab Up" owner="NetlabCommon">
+<kw name="Netlab Up" owner="RTL">
+<msg time="2026-06-22T17:52:33.308090" level="INFO">${rc} = 0</msg>
+<msg time="2026-06-22T17:52:33.308182" level="INFO">${stdout} = Creating configuration files
+[CONFIG]  spine1: normalize,initial,bgp,spine,bfd
+[CONFIG]  spine2: normalize,initial,bgp,spine,bfd
+[CONFIG]  leaf1: normalize,initial,bgp,leaf,bfd
+[CONFIG]  leaf2: normal...</msg>
+<msg time="2026-06-22T17:52:33.308233" level="INFO">${stderr} = </msg>
+<var>${rc}</var>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<arg>300</arg>
+<doc>Run `netlab up --no-config` to start containers, then push configs manually.</doc>
+<status status="PASS" start="2026-06-22T17:51:35.414744" elapsed="57.893513"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-06-22T17:52:33.309133" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${rc}</arg>
+<arg>0</arg>
+<arg>netlab up failed: ${stderr}</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-06-22T17:52:33.308751" elapsed="0.000444"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${stdout}</arg>
+<arg>OK</arg>
+<arg>Lab should report OK</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:52:33.309304" elapsed="0.000369"/>
+</kw>
+<doc>Start the lab via `netlab up`.</doc>
+<status status="PASS" start="2026-06-22T17:51:35.414516" elapsed="57.895221"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2026-06-22T17:53:03.310146" level="INFO">Slept 30 seconds.</msg>
+<msg time="2026-06-22T17:53:03.310229" level="INFO">Wait for BGP sessions to establish</msg>
+<arg>30s</arg>
+<arg>Wait for BGP sessions to establish</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2026-06-22T17:52:33.309818" elapsed="30.000469"/>
+</kw>
+<doc>Deploy the lab via netlab up and wait for BGP to stabilize.</doc>
+<status status="PASS" start="2026-06-22T17:51:35.414022" elapsed="87.896414"/>
+</test>
+<test id="s1-t2" name="All EOS Nodes Should Run Arista cEOS" line="33">
+<kw name="Verify All EOS Nodes Respond">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:03.953096" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: E3B2251C10390DCA6B76B45FEA050B15
+Hardware MAC address: 001c.7320.f1a9
+System MAC address: 001c.7320.f1a9
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.311770" elapsed="0.641368"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:03.953224" elapsed="0.000062"/>
+</return>
+<msg time="2026-06-22T17:53:03.953446" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: E3B2251C10390DCA6B76B45FEA050B15
+Hardware MAC address: 001c.7320.f1a9
+System MAC address: 001c.7320.f1a9
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>version</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.311558" elapsed="0.641905"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Arista</arg>
+<arg>${node} should be running Arista cEOS</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.953585" elapsed="0.000373"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>4.34.2.2F</arg>
+<arg>${node} should run correct image version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.954059" elapsed="0.000235"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:03.311437" elapsed="0.642887"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:04.589956" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 50C1EDD1E46F4104397BF2F3FC653AF8
+Hardware MAC address: 001c.73e1.c31e
+System MAC address: 001c.73e1.c31e
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.954778" elapsed="0.635224"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:04.590072" elapsed="0.000053"/>
+</return>
+<msg time="2026-06-22T17:53:04.590309" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 50C1EDD1E46F4104397BF2F3FC653AF8
+Hardware MAC address: 001c.73e1.c31e
+System MAC address: 001c.73e1.c31e
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>version</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.954540" elapsed="0.635795"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Arista</arg>
+<arg>${node} should be running Arista cEOS</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:04.590503" elapsed="0.000419"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>4.34.2.2F</arg>
+<arg>${node} should run correct image version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:04.591037" elapsed="0.000273"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:03.954420" elapsed="0.636925"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:05.240652" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 7E4BAB0C97844AD3BBCAB4C220E944DC
+Hardware MAC address: 001c.73f3.1b7d
+System MAC address: 001c.73f3.1b7d
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:04.591796" elapsed="0.648900"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:05.240767" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:05.240937" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 7E4BAB0C97844AD3BBCAB4C220E944DC
+Hardware MAC address: 001c.73f3.1b7d
+System MAC address: 001c.73f3.1b7d
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>version</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:04.591557" elapsed="0.649399"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Arista</arg>
+<arg>${node} should be running Arista cEOS</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.241094" elapsed="0.000395"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>4.34.2.2F</arg>
+<arg>${node} should run correct image version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.241600" elapsed="0.000251"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:04.591442" elapsed="0.650440"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:05.883791" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 08F38D3418B6AFC4369E4F192E00970E
+Hardware MAC address: 001c.73b6.fed8
+System MAC address: 001c.73b6.fed8
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.242452" elapsed="0.641386"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:05.883913" elapsed="0.000047"/>
+</return>
+<msg time="2026-06-22T17:53:05.884122" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: 08F38D3418B6AFC4369E4F192E00970E
+Hardware MAC address: 001c.73b6.fed8
+System MAC address: 001c.73b6.fed8
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>version</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.242187" elapsed="0.641958"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Arista</arg>
+<arg>${node} should be running Arista cEOS</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.884295" elapsed="0.000369"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>4.34.2.2F</arg>
+<arg>${node} should run correct image version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.884756" elapsed="0.000236"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:05.242049" elapsed="0.642974"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:06.531296" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: FF4E9E7477074F34E092CCE2C39D67E9
+Hardware MAC address: 001c.73ce.d198
+System MAC address: 001c.73ce.d198
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.885471" elapsed="0.645871"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:06.531428" elapsed="0.000045"/>
+</return>
+<msg time="2026-06-22T17:53:06.531608" level="INFO">${output} = Arista cEOSLab
+Hardware version: 
+Serial number: FF4E9E7477074F34E092CCE2C39D67E9
+Hardware MAC address: 001c.73ce.d198
+System MAC address: 001c.73ce.d198
+
+Software image version: 4.34.2.2F-46218727.43...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>version</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:05.885240" elapsed="0.646387"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>Arista</arg>
+<arg>${node} should be running Arista cEOS</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:06.531780" elapsed="0.000451"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>4.34.2.2F</arg>
+<arg>${node} should run correct image version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:06.532361" elapsed="0.000261"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:05.885112" elapsed="0.647542"/>
+</iter>
+<var>${node}</var>
+<value>@{ALL_NODES}</value>
+<status status="PASS" start="2026-06-22T17:53:03.311287" elapsed="3.221399"/>
+</for>
+<doc>Verify all EOS nodes respond with correct version.</doc>
+<status status="PASS" start="2026-06-22T17:53:03.311070" elapsed="3.221675"/>
+</kw>
+<status status="PASS" start="2026-06-22T17:53:03.310666" elapsed="3.222170"/>
+</test>
+<test id="s1-t3" name="All Data Interfaces Should Be Up On Spine Nodes" line="36">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:07.177423" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:06.533732" elapsed="0.643734"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:07.177538" elapsed="0.000047"/>
+</return>
+<msg time="2026-06-22T17:53:07.177712" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:06.533515" elapsed="0.644215"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:07.178209" level="INFO">${up_count} = ['Ethernet1      10.2.1.0/31            up         up', 'Ethernet2      10.2.1.2/31            up         up', 'Ethernet3      10.2.1.4/31            up         up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>Ethernet\\d+.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.177870" elapsed="0.000364"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:07.178691" level="INFO">Length is 3.</msg>
+<arg>${up_count}</arg>
+<arg>3</arg>
+<arg>${node} should have 3 Ethernet interfaces up/up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.178339" elapsed="0.000387"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:06.533400" elapsed="0.645358"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:07.806787" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.179214" elapsed="0.627617"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:07.806901" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:07.807067" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.178973" elapsed="0.628112"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:07.807453" level="INFO">${up_count} = ['Ethernet1      10.2.2.0/31            up         up', 'Ethernet2      10.2.2.2/31            up         up', 'Ethernet3      10.2.2.4/31            up         up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>Ethernet\\d+.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.807233" elapsed="0.000239"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:07.807985" level="INFO">Length is 3.</msg>
+<arg>${up_count}</arg>
+<arg>3</arg>
+<arg>${node} should have 3 Ethernet interfaces up/up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.807639" elapsed="0.000385"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:07.178854" elapsed="0.629202"/>
+</iter>
+<var>${node}</var>
+<value>spine1</value>
+<value>spine2</value>
+<status status="PASS" start="2026-06-22T17:53:06.533285" elapsed="1.274801"/>
+</for>
+<doc>Verify all Ethernet interfaces on spine nodes are up/up.</doc>
+<status status="PASS" start="2026-06-22T17:53:06.533001" elapsed="1.275178"/>
+</test>
+<test id="s1-t4" name="All Data Interfaces Should Be Up On Leaf Nodes" line="44">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:08.454256" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.809261" elapsed="0.645043"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:08.454380" elapsed="0.000063"/>
+</return>
+<msg time="2026-06-22T17:53:08.454576" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.809026" elapsed="0.645569"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:08.454966" level="INFO">${up_count} = ['Ethernet1      10.2.1.1/31            up         up', 'Ethernet2      10.2.2.1/31            up         up', 'Ethernet3      10.3.1.0/31            up         up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>Ethernet\\d+.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:08.454735" elapsed="0.000251"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:08.455404" level="INFO">Length is 3.</msg>
+<arg>${up_count}</arg>
+<arg>3</arg>
+<arg>${node} should have 3 Ethernet interfaces up/up (2 spine + 1 host)</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:08.455071" elapsed="0.000368"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:07.808899" elapsed="0.646572"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:09.103625" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:08.455913" elapsed="0.647780"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:09.103794" elapsed="0.000065"/>
+</return>
+<msg time="2026-06-22T17:53:09.104092" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:08.455687" elapsed="0.648440"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:09.104560" level="INFO">${up_count} = ['Ethernet1      10.2.1.3/31            up         up', 'Ethernet2      10.2.2.3/31            up         up', 'Ethernet3      10.3.2.0/31            up         up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>Ethernet\\d+.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.104326" elapsed="0.000254"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:09.104987" level="INFO">Length is 3.</msg>
+<arg>${up_count}</arg>
+<arg>3</arg>
+<arg>${node} should have 3 Ethernet interfaces up/up (2 spine + 1 host)</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.104666" elapsed="0.000355"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:08.455563" elapsed="0.649489"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:09.747628" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.105495" elapsed="0.642176"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:09.747741" elapsed="0.000044"/>
+</return>
+<msg time="2026-06-22T17:53:09.747913" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.105267" elapsed="0.642664"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:09.748313" level="INFO">${up_count} = ['Ethernet1      10.2.1.5/31            up         up', 'Ethernet2      10.2.2.5/31            up         up', 'Ethernet3      10.3.3.0/31            up         up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>Ethernet\\d+.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.748068" elapsed="0.000266"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:09.748744" level="INFO">Length is 3.</msg>
+<arg>${up_count}</arg>
+<arg>3</arg>
+<arg>${node} should have 3 Ethernet interfaces up/up (2 spine + 1 host)</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.748432" elapsed="0.000345"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:09.105143" elapsed="0.643666"/>
+</iter>
+<var>${node}</var>
+<value>leaf1</value>
+<value>leaf2</value>
+<value>leaf3</value>
+<status status="PASS" start="2026-06-22T17:53:07.808779" elapsed="1.940059"/>
+</for>
+<doc>Verify all Ethernet interfaces on leaf nodes are up/up.</doc>
+<status status="PASS" start="2026-06-22T17:53:07.808389" elapsed="1.940541"/>
+</test>
+<test id="s1-t5" name="Loopback0 Should Have Correct IP On All EOS Nodes" line="52">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:10.544706" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.750091" elapsed="0.794722"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:10.544888" elapsed="0.000049"/>
+</return>
+<msg time="2026-06-22T17:53:10.545075" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.749628" elapsed="0.795466"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_ip}</arg>
+<arg>${node} Loopback0 should be ${expected_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:10.545254" elapsed="0.000611"/>
+</kw>
+<var name="${node}">spine1</var>
+<var name="${expected_ip}">10.0.1.1/32</var>
+<status status="PASS" start="2026-06-22T17:53:09.749491" elapsed="0.796444"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:11.640059" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:10.546530" elapsed="1.093573"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:11.640172" elapsed="0.000055"/>
+</return>
+<msg time="2026-06-22T17:53:11.640356" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:10.546275" elapsed="1.094099"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_ip}</arg>
+<arg>${node} Loopback0 should be ${expected_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:11.640508" elapsed="0.000404"/>
+</kw>
+<var name="${node}">spine2</var>
+<var name="${expected_ip}">10.0.2.1/32</var>
+<status status="PASS" start="2026-06-22T17:53:10.546102" elapsed="1.094847"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:12.664120" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:11.641424" elapsed="1.022740"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:12.664264" elapsed="0.000048"/>
+</return>
+<msg time="2026-06-22T17:53:12.664489" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:11.641179" elapsed="1.023331"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_ip}</arg>
+<arg>${node} Loopback0 should be ${expected_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:12.664646" elapsed="0.000410"/>
+</kw>
+<var name="${node}">leaf1</var>
+<var name="${expected_ip}">10.0.11.1/32</var>
+<status status="PASS" start="2026-06-22T17:53:11.641055" elapsed="1.024058"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:13.301889" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:12.665646" elapsed="0.636293"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:13.302012" elapsed="0.000049"/>
+</return>
+<msg time="2026-06-22T17:53:13.302227" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:12.665399" elapsed="0.636850"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_ip}</arg>
+<arg>${node} Loopback0 should be ${expected_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.302385" elapsed="0.000397"/>
+</kw>
+<var name="${node}">leaf2</var>
+<var name="${expected_ip}">10.0.12.1/32</var>
+<status status="PASS" start="2026-06-22T17:53:12.665252" elapsed="0.637567"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:13.935481" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.303271" elapsed="0.632254"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:13.935592" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:13.935759" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.303041" elapsed="0.632736"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_ip}</arg>
+<arg>${node} Loopback0 should be ${expected_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.935906" elapsed="0.000448"/>
+</kw>
+<var name="${node}">leaf3</var>
+<var name="${expected_ip}">10.0.13.1/32</var>
+<status status="PASS" start="2026-06-22T17:53:13.302921" elapsed="0.633483"/>
+</iter>
+<var>${node}</var>
+<var>${expected_ip}</var>
+<value>&amp;{LOOPBACK_IPS}</value>
+<status status="PASS" start="2026-06-22T17:53:09.749326" elapsed="4.187165"/>
+</for>
+<doc>Verify Loopback0 IP matches the IP plan.</doc>
+<status status="PASS" start="2026-06-22T17:53:09.749075" elapsed="4.187516"/>
+</test>
+<test id="s1-t6" name="Loopback0 Should Be Up On All EOS Nodes" line="59">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:14.560165" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.937558" elapsed="0.622664"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:14.560306" elapsed="0.000048"/>
+</return>
+<msg time="2026-06-22T17:53:14.560493" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.937293" elapsed="0.623217"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:14.560906" level="INFO">${match} = ['Loopback0      10.0.1.1/32            up         up']</msg>
+<var>${match}</var>
+<arg>${output}</arg>
+<arg>Loopback0.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:14.560638" elapsed="0.000286"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:14.561351" level="INFO">Length is 1.</msg>
+<arg>${match}</arg>
+<arg>1</arg>
+<arg>${node} Loopback0 should be up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:14.561005" elapsed="0.000390"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:13.937133" elapsed="0.624300"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:15.183430" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:14.562078" elapsed="0.621397"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:15.183546" elapsed="0.000044"/>
+</return>
+<msg time="2026-06-22T17:53:15.183718" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.2.0/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:14.561654" elapsed="0.622083"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:15.184079" level="INFO">${match} = ['Loopback0      10.0.2.1/32            up         up']</msg>
+<var>${match}</var>
+<arg>${output}</arg>
+<arg>Loopback0.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.183871" elapsed="0.000226"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:15.184521" level="INFO">Length is 1.</msg>
+<arg>${match}</arg>
+<arg>1</arg>
+<arg>${node} Loopback0 should be up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.184179" elapsed="0.000380"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:14.561531" elapsed="0.623060"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:15.796334" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.185022" elapsed="0.611352"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:15.796441" elapsed="0.000039"/>
+</return>
+<msg time="2026-06-22T17:53:15.796602" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.1/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.184797" elapsed="0.611821"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:15.796960" level="INFO">${match} = ['Loopback0      10.0.11.1/32           up         up']</msg>
+<var>${match}</var>
+<arg>${output}</arg>
+<arg>Loopback0.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.796757" elapsed="0.000220"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:15.797406" level="INFO">Length is 1.</msg>
+<arg>${match}</arg>
+<arg>1</arg>
+<arg>${node} Loopback0 should be up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.797057" elapsed="0.000398"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:15.184681" elapsed="0.612813"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:16.408072" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.797928" elapsed="0.610186"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:16.408187" elapsed="0.000053"/>
+</return>
+<msg time="2026-06-22T17:53:16.408370" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.3/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:15.797715" elapsed="0.610674"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:16.408739" level="INFO">${match} = ['Loopback0      10.0.12.1/32           up         up']</msg>
+<var>${match}</var>
+<arg>${output}</arg>
+<arg>Loopback0.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:16.408524" elapsed="0.000234"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:16.409261" level="INFO">Length is 1.</msg>
+<arg>${match}</arg>
+<arg>1</arg>
+<arg>${node} Loopback0 should be up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:16.408912" elapsed="0.000389"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:15.797596" elapsed="0.611739"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:17.038652" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:16.409768" elapsed="0.628926"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:17.038764" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:17.038932" level="INFO">${output} = Address
+Interface      IP Address             Status     Protocol         MTU   Owner  
+-------------- ---------------------- ---------- ------------ --------- -------
+Ethernet1      10.2.1.5/31      ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>ip interface brief</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:16.409544" elapsed="0.629405"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:17.039305" level="INFO">${match} = ['Loopback0      10.0.13.1/32           up         up']</msg>
+<var>${match}</var>
+<arg>${output}</arg>
+<arg>Loopback0.*up.*up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.039080" elapsed="0.000244"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:17.039730" level="INFO">Length is 1.</msg>
+<arg>${match}</arg>
+<arg>1</arg>
+<arg>${node} Loopback0 should be up</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.039414" elapsed="0.000351"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:16.409430" elapsed="0.630365"/>
+</iter>
+<var>${node}</var>
+<value>@{ALL_NODES}</value>
+<status status="PASS" start="2026-06-22T17:53:13.936982" elapsed="3.102842"/>
+</for>
+<doc>Verify Loopback0 interface status is up/up.</doc>
+<status status="PASS" start="2026-06-22T17:53:13.936739" elapsed="3.103168"/>
+</test>
+<test id="s1-t7" name="BGP Neighbors Should Be Established On Spine1" line="67">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:17.675999" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:07, last write 00:00:49
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.040638" elapsed="0.635404"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:17.676114" elapsed="0.000041"/>
+</return>
+<msg time="2026-06-22T17:53:17.676323" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:07, last write 00:00:49
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.040424" elapsed="0.635918"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.676631" elapsed="0.000386"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.1</var>
+<status status="PASS" start="2026-06-22T17:53:17.676523" elapsed="0.000533"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.677210" elapsed="0.000276"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.3</var>
+<status status="PASS" start="2026-06-22T17:53:17.677129" elapsed="0.000390"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.677638" elapsed="0.000477"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.5</var>
+<status status="PASS" start="2026-06-22T17:53:17.677580" elapsed="0.000571"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{SPINE1_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:17.676400" elapsed="0.001774"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:17.678673" level="INFO">${established_count} = ['BGP state is Established', 'BGP state is Established', 'BGP state is Established']</msg>
+<var>${established_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BGP state is Established</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.678273" elapsed="0.000421"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:17.679007" level="INFO">Length is 3.</msg>
+<arg>${established_count}</arg>
+<arg>3</arg>
+<arg>spine1 should have 3 Established BGP sessions</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.678773" elapsed="0.000267"/>
+</kw>
+<doc>spine1 should have 3 eBGP sessions to leaf1, leaf2, leaf3.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.040053" elapsed="0.639073"/>
+</test>
+<test id="s1-t8" name="BGP Neighbors Should Be Established On Spine2" line="76">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:18.301481" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:09, last write 00:00:51
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.679814" elapsed="0.621710"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:18.301596" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:18.301766" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:09, last write 00:00:51
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>spine2</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.679615" elapsed="0.622170"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.302074" elapsed="0.000434"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.1</var>
+<status status="PASS" start="2026-06-22T17:53:18.301960" elapsed="0.000595"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.302797" elapsed="0.000298"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.3</var>
+<status status="PASS" start="2026-06-22T17:53:18.302703" elapsed="0.000424"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.303291" elapsed="0.000297"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.5</var>
+<status status="PASS" start="2026-06-22T17:53:18.303189" elapsed="0.000433"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{SPINE2_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:18.301841" elapsed="0.001804"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:18.304047" level="INFO">${established_count} = ['BGP state is Established', 'BGP state is Established', 'BGP state is Established']</msg>
+<var>${established_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BGP state is Established</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.303735" elapsed="0.000333"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:18.304457" level="INFO">Length is 3.</msg>
+<arg>${established_count}</arg>
+<arg>3</arg>
+<arg>spine2 should have 3 Established BGP sessions</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.304148" elapsed="0.000347"/>
+</kw>
+<doc>spine2 should have 3 eBGP sessions to leaf1, leaf2, leaf3.</doc>
+<status status="PASS" start="2026-06-22T17:53:17.679284" elapsed="0.625305"/>
+</test>
+<test id="s1-t9" name="BGP Neighbors Should Be Established On Leaf1" line="85">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:18.922565" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:50, last write 00:00:08
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.305305" elapsed="0.617302"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:18.922680" elapsed="0.000045"/>
+</return>
+<msg time="2026-06-22T17:53:18.922847" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:50, last write 00:00:08
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>leaf1</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.305072" elapsed="0.617794"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf1 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.923154" elapsed="0.000450"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.0</var>
+<status status="PASS" start="2026-06-22T17:53:18.923046" elapsed="0.000606"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf1 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.923821" elapsed="0.000258"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.0</var>
+<status status="PASS" start="2026-06-22T17:53:18.923730" elapsed="0.000380"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{LEAF1_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:18.922921" elapsed="0.001211"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:18.924518" level="INFO">${established_count} = ['BGP state is Established', 'BGP state is Established']</msg>
+<var>${established_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BGP state is Established</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.924242" elapsed="0.000296"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:18.924855" level="INFO">Length is 2.</msg>
+<arg>${established_count}</arg>
+<arg>2</arg>
+<arg>leaf1 should have 2 Established BGP sessions</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.924623" elapsed="0.000263"/>
+</kw>
+<doc>leaf1 should have 2 eBGP sessions to spine1 and spine2.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.304734" elapsed="0.620240"/>
+</test>
+<test id="s1-t10" name="BGP Neighbors Should Be Established On Leaf2" line="94">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:19.554233" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:08, last write 00:00:08
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.925722" elapsed="0.628556"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:19.554353" elapsed="0.000053"/>
+</return>
+<msg time="2026-06-22T17:53:19.554523" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:08, last write 00:00:08
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>leaf2</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.925512" elapsed="0.629027"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf2 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.554802" elapsed="0.000356"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.2</var>
+<status status="PASS" start="2026-06-22T17:53:19.554701" elapsed="0.000509"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf2 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.555366" elapsed="0.000255"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.2</var>
+<status status="PASS" start="2026-06-22T17:53:19.555282" elapsed="0.000387"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{LEAF2_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:19.554589" elapsed="0.001101"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:19.556048" level="INFO">${established_count} = ['BGP state is Established', 'BGP state is Established']</msg>
+<var>${established_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BGP state is Established</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.555781" elapsed="0.000288"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:19.556479" level="INFO">Length is 2.</msg>
+<arg>${established_count}</arg>
+<arg>2</arg>
+<arg>leaf2 should have 2 Established BGP sessions</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.556153" elapsed="0.000367"/>
+</kw>
+<doc>leaf2 should have 2 eBGP sessions to spine1 and spine2.</doc>
+<status status="PASS" start="2026-06-22T17:53:18.925118" elapsed="0.631497"/>
+</test>
+<test id="s1-t11" name="BGP Neighbors Should Be Established On Leaf3" line="103">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:20.170314" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:51, last write 00:00:51
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.557701" elapsed="0.612661"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:20.170450" elapsed="0.000049"/>
+</return>
+<msg time="2026-06-22T17:53:20.170650" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:51, last write 00:00:51
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>leaf3</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.557111" elapsed="0.613559"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf3 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.170956" elapsed="0.000410"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.4</var>
+<status status="PASS" start="2026-06-22T17:53:20.170851" elapsed="0.000556"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>leaf3 should have BGP neighbor ${neighbor_ip}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.171560" elapsed="0.000265"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.4</var>
+<status status="PASS" start="2026-06-22T17:53:20.171482" elapsed="0.000377"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{LEAF3_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:20.170730" elapsed="0.001152"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:20.172222" level="INFO">${established_count} = ['BGP state is Established', 'BGP state is Established']</msg>
+<var>${established_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BGP state is Established</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.171971" elapsed="0.000270"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:20.172555" level="INFO">Length is 2.</msg>
+<arg>${established_count}</arg>
+<arg>2</arg>
+<arg>leaf3 should have 2 Established BGP sessions</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.172320" elapsed="0.000267"/>
+</kw>
+<doc>leaf3 should have 2 eBGP sessions to spine1 and spine2.</doc>
+<status status="PASS" start="2026-06-22T17:53:19.556764" elapsed="0.615909"/>
+</test>
+<test id="s1-t12" name="BGP Should Distribute Routes On Spine1" line="112">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:20.782095" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.1.1, local AS number 65001
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+         ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.173377" elapsed="0.608762"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:20.782259" elapsed="0.000065"/>
+</return>
+<msg time="2026-06-22T17:53:20.782492" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.1.1, local AS number 65001
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+         ...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>ip bgp</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.173166" elapsed="0.609349"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.2.1/32</arg>
+<arg>spine1 should have BGP route to spine2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.782652" elapsed="0.000349"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.11.1/32</arg>
+<arg>spine1 should have BGP route to leaf1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.783102" elapsed="0.000244"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.12.1/32</arg>
+<arg>spine1 should have BGP route to leaf2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.783430" elapsed="0.000212"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.13.1/32</arg>
+<arg>spine1 should have BGP route to leaf3</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.783721" elapsed="0.000208"/>
+</kw>
+<doc>spine1 should have BGP routes to spine2 and all leaf loopbacks.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.172813" elapsed="0.611203"/>
+</test>
+<test id="s1-t13" name="BGP Should Distribute Routes On Spine2" line="120">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:21.384886" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.2.1, local AS number 65002
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+         ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.784749" elapsed="0.600194"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:21.385035" elapsed="0.000058"/>
+</return>
+<msg time="2026-06-22T17:53:21.385271" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.2.1, local AS number 65002
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+         ...</msg>
+<var>${output}</var>
+<arg>spine2</arg>
+<arg>ip bgp</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.784541" elapsed="0.600756"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.1.1/32</arg>
+<arg>spine2 should have BGP route to spine1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.385474" elapsed="0.000457"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.11.1/32</arg>
+<arg>spine2 should have BGP route to leaf1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.386054" elapsed="0.000297"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.12.1/32</arg>
+<arg>spine2 should have BGP route to leaf2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.386603" elapsed="0.000359"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.13.1/32</arg>
+<arg>spine2 should have BGP route to leaf3</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.387083" elapsed="0.000311"/>
+</kw>
+<doc>spine2 should have BGP routes to spine1 and all leaf loopbacks.</doc>
+<status status="PASS" start="2026-06-22T17:53:20.784187" elapsed="0.603326"/>
+</test>
+<test id="s1-t14" name="BGP Should Distribute Routes On Leaf1" line="128">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:22.016834" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.11.1, local AS number 65101
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.388479" elapsed="0.628403"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:22.016954" elapsed="0.000044"/>
+</return>
+<msg time="2026-06-22T17:53:22.017130" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.11.1, local AS number 65101
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>leaf1</arg>
+<arg>ip bgp</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.388215" elapsed="0.628935"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.1.1/32</arg>
+<arg>leaf1 should have BGP route to spine1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.017296" elapsed="0.000351"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.2.1/32</arg>
+<arg>leaf1 should have BGP route to spine2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.017726" elapsed="0.000196"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.12.1/32</arg>
+<arg>leaf1 should have BGP route to leaf2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.017995" elapsed="0.000188"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.13.1/32</arg>
+<arg>leaf1 should have BGP route to leaf3</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.018261" elapsed="0.000405"/>
+</kw>
+<doc>leaf1 should have BGP routes to spines and other leaves.</doc>
+<status status="PASS" start="2026-06-22T17:53:21.387722" elapsed="0.631033"/>
+</test>
+<test id="s1-t15" name="BGP Should Distribute Routes On Leaf2" line="136">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:22.633743" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.12.1, local AS number 65102
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.019441" elapsed="0.614365"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:22.633900" elapsed="0.000047"/>
+</return>
+<msg time="2026-06-22T17:53:22.634094" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.12.1, local AS number 65102
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>leaf2</arg>
+<arg>ip bgp</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.019244" elapsed="0.614870"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.1.1/32</arg>
+<arg>leaf2 should have BGP route to spine1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.634258" elapsed="0.000455"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.2.1/32</arg>
+<arg>leaf2 should have BGP route to spine2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.634858" elapsed="0.000276"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.11.1/32</arg>
+<arg>leaf2 should have BGP route to leaf1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.635223" elapsed="0.000307"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.13.1/32</arg>
+<arg>leaf2 should have BGP route to leaf3</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.635654" elapsed="0.000289"/>
+</kw>
+<doc>leaf2 should have BGP routes to spines and other leaves.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.018911" elapsed="0.617125"/>
+</test>
+<test id="s1-t16" name="BGP Should Distribute Routes On Leaf3" line="144">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:23.239441" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.13.1, local AS number 65103
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.636783" elapsed="0.602700"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:23.239550" elapsed="0.000040"/>
+</return>
+<msg time="2026-06-22T17:53:23.239729" level="INFO">${output} = BGP routing table information for VRF default
+Router identifier 10.0.13.1, local AS number 65103
+Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
+        ...</msg>
+<var>${output}</var>
+<arg>leaf3</arg>
+<arg>ip bgp</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.636568" elapsed="0.603181"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.1.1/32</arg>
+<arg>leaf3 should have BGP route to spine1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.239881" elapsed="0.000378"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.2.1/32</arg>
+<arg>leaf3 should have BGP route to spine2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.240378" elapsed="0.000234"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.11.1/32</arg>
+<arg>leaf3 should have BGP route to leaf1</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.240692" elapsed="0.000214"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>10.0.12.1/32</arg>
+<arg>leaf3 should have BGP route to leaf2</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.240977" elapsed="0.000189"/>
+</kw>
+<doc>leaf3 should have BGP routes to spines and other leaves.</doc>
+<status status="PASS" start="2026-06-22T17:53:22.636174" elapsed="0.605199"/>
+</test>
+<test id="s1-t17" name="Ping Spine1 To Leaf1 Loopback Should Succeed" line="152">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:23.883501" level="INFO">${output} = PING 10.0.11.1 (10.0.11.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.11.1: icmp_seq=1 ttl=64 time=0.038 ms
+80 bytes from 10.0.11.1: icmp_seq=2 ttl=64 time=0.009 ms
+80 bytes from 10.0.1...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:23.242130" elapsed="0.641416"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:23.883623" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:23.883794" level="INFO">${output} = PING 10.0.11.1 (10.0.11.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.11.1: icmp_seq=1 ttl=64 time=0.038 ms
+80 bytes from 10.0.11.1: icmp_seq=2 ttl=64 time=0.009 ms
+80 bytes from 10.0.1...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>10.0.11.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.241849" elapsed="0.641964"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.883953" elapsed="0.000381"/>
+</kw>
+<status status="PASS" start="2026-06-22T17:53:23.241521" elapsed="0.642917"/>
+</test>
+<test id="s1-t18" name="Ping Spine1 To Leaf3 Loopback Should Succeed" line="156">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:24.530004" level="INFO">${output} = PING 10.0.13.1 (10.0.13.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.13.1: icmp_seq=1 ttl=64 time=0.052 ms
+80 bytes from 10.0.13.1: icmp_seq=2 ttl=64 time=0.008 ms
+80 bytes from 10.0.1...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:23.885187" elapsed="0.644877"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:24.530165" elapsed="0.000070"/>
+</return>
+<msg time="2026-06-22T17:53:24.530410" level="INFO">${output} = PING 10.0.13.1 (10.0.13.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.13.1: icmp_seq=1 ttl=64 time=0.052 ms
+80 bytes from 10.0.13.1: icmp_seq=2 ttl=64 time=0.008 ms
+80 bytes from 10.0.1...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>10.0.13.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:23.884904" elapsed="0.645527"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:24.530567" elapsed="0.000332"/>
+</kw>
+<status status="PASS" start="2026-06-22T17:53:23.884586" elapsed="0.646405"/>
+</test>
+<test id="s1-t19" name="Ping Spine1 To Spine2 Loopback Should Succeed" line="160">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:25.178248" level="INFO">${output} = PING 10.0.2.1 (10.0.2.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.2.1: icmp_seq=1 ttl=63 time=0.673 ms
+80 bytes from 10.0.2.1: icmp_seq=2 ttl=63 time=0.353 ms
+80 bytes from 10.0.2.1: ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:24.531734" elapsed="0.646557"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:25.178366" elapsed="0.000045"/>
+</return>
+<msg time="2026-06-22T17:53:25.178541" level="INFO">${output} = PING 10.0.2.1 (10.0.2.1) from 10.0.1.1 : 72(100) bytes of data.
+80 bytes from 10.0.2.1: icmp_seq=1 ttl=63 time=0.673 ms
+80 bytes from 10.0.2.1: icmp_seq=2 ttl=63 time=0.353 ms
+80 bytes from 10.0.2.1: ...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>10.0.2.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:24.531461" elapsed="0.647098"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.178693" elapsed="0.000334"/>
+</kw>
+<status status="PASS" start="2026-06-22T17:53:24.531138" elapsed="0.647978"/>
+</test>
+<test id="s1-t20" name="Ping Leaf1 To Leaf2 Loopback Should Succeed" line="164">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:25.811361" level="INFO">${output} = PING 10.0.12.1 (10.0.12.1) from 10.0.11.1 : 72(100) bytes of data.
+80 bytes from 10.0.12.1: icmp_seq=1 ttl=63 time=0.650 ms
+80 bytes from 10.0.12.1: icmp_seq=2 ttl=63 time=0.420 ms
+80 bytes from 10.0....</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:25.179889" elapsed="0.631525"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:25.811512" elapsed="0.000056"/>
+</return>
+<msg time="2026-06-22T17:53:25.811726" level="INFO">${output} = PING 10.0.12.1 (10.0.12.1) from 10.0.11.1 : 72(100) bytes of data.
+80 bytes from 10.0.12.1: icmp_seq=1 ttl=63 time=0.650 ms
+80 bytes from 10.0.12.1: icmp_seq=2 ttl=63 time=0.420 ms
+80 bytes from 10.0....</msg>
+<var>${output}</var>
+<arg>leaf1</arg>
+<arg>10.0.12.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.179623" elapsed="0.632128"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.811927" elapsed="0.000450"/>
+</kw>
+<doc>Cross-spine leaf-to-leaf ping via ECMP.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.179273" elapsed="0.633226"/>
+</test>
+<test id="s1-t21" name="Ping Leaf1 To Leaf3 Loopback Should Succeed" line="169">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:26.451650" level="INFO">${output} = PING 10.0.13.1 (10.0.13.1) from 10.0.11.1 : 72(100) bytes of data.
+80 bytes from 10.0.13.1: icmp_seq=1 ttl=63 time=0.817 ms
+80 bytes from 10.0.13.1: icmp_seq=2 ttl=63 time=0.443 ms
+80 bytes from 10.0....</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:25.813519" elapsed="0.638174"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:26.451769" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:26.451934" level="INFO">${output} = PING 10.0.13.1 (10.0.13.1) from 10.0.11.1 : 72(100) bytes of data.
+80 bytes from 10.0.13.1: icmp_seq=1 ttl=63 time=0.817 ms
+80 bytes from 10.0.13.1: icmp_seq=2 ttl=63 time=0.443 ms
+80 bytes from 10.0....</msg>
+<var>${output}</var>
+<arg>leaf1</arg>
+<arg>10.0.13.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.813161" elapsed="0.638882"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:26.452209" elapsed="0.000352"/>
+</kw>
+<doc>Cross-spine leaf-to-leaf ping via ECMP.</doc>
+<status status="PASS" start="2026-06-22T17:53:25.812690" elapsed="0.639959"/>
+</test>
+<test id="s1-t22" name="Ping Leaf3 To Spine2 Loopback Should Succeed" line="174">
+<kw name="Run Ping Command" owner="NetlabCommon">
+<kw name="Run Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.097159" level="INFO">${output} = PING 10.0.2.1 (10.0.2.1) from 10.0.13.1 : 72(100) bytes of data.
+80 bytes from 10.0.2.1: icmp_seq=1 ttl=64 time=0.050 ms
+80 bytes from 10.0.2.1: icmp_seq=2 ttl=64 time=0.009 ms
+80 bytes from 10.0.2.1:...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${target_ip}</arg>
+<arg>${source}</arg>
+<arg>${repeat}</arg>
+<doc>Ping from a node via `netlab connect` (no show prefix).</doc>
+<status status="PASS" start="2026-06-22T17:53:26.453406" elapsed="0.643804"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:27.097287" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:27.097458" level="INFO">${output} = PING 10.0.2.1 (10.0.2.1) from 10.0.13.1 : 72(100) bytes of data.
+80 bytes from 10.0.2.1: icmp_seq=1 ttl=64 time=0.050 ms
+80 bytes from 10.0.2.1: icmp_seq=2 ttl=64 time=0.009 ms
+80 bytes from 10.0.2.1:...</msg>
+<var>${output}</var>
+<arg>leaf3</arg>
+<arg>10.0.2.1</arg>
+<arg>Loopback0</arg>
+<arg>repeat=3</arg>
+<doc>Ping from a node via `netlab connect`.</doc>
+<status status="PASS" start="2026-06-22T17:53:26.453119" elapsed="0.644357"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.097612" elapsed="0.000339"/>
+</kw>
+<status status="PASS" start="2026-06-22T17:53:26.452794" elapsed="0.645251"/>
+</test>
+<test id="s1-t23" name="Host1 Should Have Default Route Via Leaf1" line="178">
+<kw name="Run Host Show Route" owner="RTL">
+<msg time="2026-06-22T17:53:27.110685" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host1</arg>
+<doc>Show routing table on a Linux host container.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.098517" elapsed="0.012210"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.111320" level="FAIL">'' does not contain 'default via 10.3.1.0'</msg>
+<arg>${output}</arg>
+<arg>default via 10.3.1.0</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.110890" elapsed="0.000591">'' does not contain 'default via 10.3.1.0'</status>
+</kw>
+<doc>Verify host1 has a default route pointing to leaf1.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.098194" elapsed="0.013497">'' does not contain 'default via 10.3.1.0'</status>
+</test>
+<test id="s1-t24" name="Host2 Should Have Default Route Via Leaf2" line="183">
+<kw name="Run Host Show Route" owner="RTL">
+<msg time="2026-06-22T17:53:27.124027" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host2</arg>
+<doc>Show routing table on a Linux host container.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.112348" elapsed="0.011708"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.124549" level="FAIL">'' does not contain 'default via 10.3.2.0'</msg>
+<arg>${output}</arg>
+<arg>default via 10.3.2.0</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.124181" elapsed="0.000440">'' does not contain 'default via 10.3.2.0'</status>
+</kw>
+<status status="FAIL" start="2026-06-22T17:53:27.111936" elapsed="0.012810">'' does not contain 'default via 10.3.2.0'</status>
+</test>
+<test id="s1-t25" name="Host3 Should Have Default Route Via Leaf3" line="187">
+<kw name="Run Host Show Route" owner="RTL">
+<msg time="2026-06-22T17:53:27.136374" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host3</arg>
+<doc>Show routing table on a Linux host container.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.125139" elapsed="0.011264"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.136842" level="FAIL">'' does not contain 'default via 10.3.3.0'</msg>
+<arg>${output}</arg>
+<arg>default via 10.3.3.0</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.136516" elapsed="0.000382">'' does not contain 'default via 10.3.3.0'</status>
+</kw>
+<status status="FAIL" start="2026-06-22T17:53:27.124888" elapsed="0.012119">'' does not contain 'default via 10.3.3.0'</status>
+</test>
+<test id="s1-t26" name="Host1 Should Ping Spine1 Loopback" line="191">
+<kw name="Run Host Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.148174" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host1</arg>
+<arg>10.0.1.1</arg>
+<arg>count=3</arg>
+<doc>Ping from a Linux host container via docker exec.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.137399" elapsed="0.010807"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.148627" level="FAIL">'' does not contain '0% packet loss'</msg>
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.148315" elapsed="0.000364">'' does not contain '0% packet loss'</status>
+</kw>
+<status status="FAIL" start="2026-06-22T17:53:27.137141" elapsed="0.011644">'' does not contain '0% packet loss'</status>
+</test>
+<test id="s1-t27" name="Host1 Should Ping Leaf2 Loopback" line="195">
+<kw name="Run Host Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.160314" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host1</arg>
+<arg>10.0.12.1</arg>
+<arg>count=3</arg>
+<doc>Ping from a Linux host container via docker exec.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.149137" elapsed="0.011205"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.160760" level="FAIL">'' does not contain '0% packet loss'</msg>
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.160454" elapsed="0.000360">'' does not contain '0% packet loss'</status>
+</kw>
+<status status="FAIL" start="2026-06-22T17:53:27.148919" elapsed="0.011999">'' does not contain '0% packet loss'</status>
+</test>
+<test id="s1-t28" name="Host2 Should Ping Spine2 Loopback" line="199">
+<kw name="Run Host Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.172083" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host2</arg>
+<arg>10.0.2.1</arg>
+<arg>count=3</arg>
+<doc>Ping from a Linux host container via docker exec.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.161298" elapsed="0.010814"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.172526" level="FAIL">'' does not contain '0% packet loss'</msg>
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.172225" elapsed="0.000352">'' does not contain '0% packet loss'</status>
+</kw>
+<status status="FAIL" start="2026-06-22T17:53:27.161051" elapsed="0.011629">'' does not contain '0% packet loss'</status>
+</test>
+<test id="s1-t29" name="Host2 Should Ping Host3" line="203">
+<kw name="Run Host Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.183842" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host2</arg>
+<arg>10.3.3.1</arg>
+<arg>count=3</arg>
+<doc>Ping from a Linux host container via docker exec.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.173039" elapsed="0.010833"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.184363" level="FAIL">'' does not contain '0% packet loss'</msg>
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.184045" elapsed="0.000373">'' does not contain '0% packet loss'</status>
+</kw>
+<doc>Cross-host ping via the fabric.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.172809" elapsed="0.011717">'' does not contain '0% packet loss'</status>
+</test>
+<test id="s1-t30" name="Host3 Should Ping Host1" line="208">
+<kw name="Run Host Ping" owner="RTL">
+<msg time="2026-06-22T17:53:27.196161" level="INFO">${output} = </msg>
+<var>${output}</var>
+<arg>host3</arg>
+<arg>10.3.1.1</arg>
+<arg>count=3</arg>
+<doc>Ping from a Linux host container via docker exec.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.184890" elapsed="0.011313"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<msg time="2026-06-22T17:53:27.196748" level="FAIL">'' does not contain '0% packet loss'</msg>
+<arg>${output}</arg>
+<arg>0% packet loss</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.196355" elapsed="0.000460">'' does not contain '0% packet loss'</status>
+</kw>
+<doc>Cross-host ping via the fabric.</doc>
+<status status="FAIL" start="2026-06-22T17:53:27.184660" elapsed="0.012292">'' does not contain '0% packet loss'</status>
+</test>
+<test id="s1-t31" name="BFD Should Be Configured On Spine Interfaces" line="213">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:27.799427" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.198007" elapsed="0.601466"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:27.799544" elapsed="0.000049"/>
+</return>
+<msg time="2026-06-22T17:53:27.799746" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.197788" elapsed="0.601979"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:27.800477" level="INFO">${bfd_count} = ['10.2.1.1', '10.2.1.3', '10.2.1.5']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>\\d+\\.\\d+\\.\\d+\\.\\d+</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.799917" elapsed="0.000583"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${bfd_count}) &gt;= 3</arg>
+<arg>${node} should have at least 3 BFD peers configured</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.800596" elapsed="0.000432"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:27.197673" elapsed="0.603389"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:28.421194" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.801496" elapsed="0.619760"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:28.421320" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:28.421483" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.801266" elapsed="0.620235"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:28.421857" level="INFO">${bfd_count} = ['10.2.2.1', '10.2.2.3', '10.2.2.5']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>\\d+\\.\\d+\\.\\d+\\.\\d+</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:28.421635" elapsed="0.000242"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${bfd_count}) &gt;= 3</arg>
+<arg>${node} should have at least 3 BFD peers configured</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:28.421964" elapsed="0.000423"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:27.801149" elapsed="0.621280"/>
+</iter>
+<var>${node}</var>
+<value>spine1</value>
+<value>spine2</value>
+<status status="PASS" start="2026-06-22T17:53:27.197533" elapsed="1.224925"/>
+</for>
+<doc>Verify BFD peers are configured on all Ethernet interfaces of spine nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:27.197135" elapsed="1.225413"/>
+</test>
+<test id="s1-t32" name="BFD Should Be Configured On Leaf Interfaces" line="221">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:29.030268" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:28.423398" elapsed="0.606914"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:29.030381" elapsed="0.000046"/>
+</return>
+<msg time="2026-06-22T17:53:29.030555" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:28.423171" elapsed="0.607402"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:29.030938" level="INFO">${bfd_count} = ['10.2.1.0', '10.2.2.0']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>\\d+\\.\\d+\\.\\d+\\.\\d+</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.030706" elapsed="0.000252"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${bfd_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD peers configured</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.031042" elapsed="0.000408"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:28.423054" elapsed="0.608433"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:29.648673" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.031920" elapsed="0.616850"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:29.648847" elapsed="0.000045"/>
+</return>
+<msg time="2026-06-22T17:53:29.649030" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.031700" elapsed="0.617349"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:29.649439" level="INFO">${bfd_count} = ['10.2.1.2', '10.2.2.2']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>\\d+\\.\\d+\\.\\d+\\.\\d+</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.649182" elapsed="0.000277"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${bfd_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD peers configured</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.649550" elapsed="0.000385"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:29.031584" elapsed="0.618390"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:30.263525" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.650425" elapsed="0.613144"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:30.263640" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:30.263809" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:29.650189" elapsed="0.613639"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:30.264192" level="INFO">${bfd_count} = ['10.2.1.4', '10.2.2.4']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>\\d+\\.\\d+\\.\\d+\\.\\d+</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.263963" elapsed="0.000264"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${bfd_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD peers configured</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.264322" elapsed="0.000390"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:29.650071" elapsed="0.614677"/>
+</iter>
+<var>${node}</var>
+<value>leaf1</value>
+<value>leaf2</value>
+<value>leaf3</value>
+<status status="PASS" start="2026-06-22T17:53:28.422946" elapsed="1.841831"/>
+</for>
+<doc>Verify BFD peers are configured on spine-facing interfaces of leaf nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:28.422687" elapsed="1.842180"/>
+</test>
+<test id="s1-t33" name="BFD Sessions Should Be Up On Spine Nodes" line="229">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:30.859445" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.265716" elapsed="0.593783"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:30.859591" elapsed="0.000061"/>
+</return>
+<msg time="2026-06-22T17:53:30.859834" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.265500" elapsed="0.594358"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:30.860451" level="INFO">${up_count} = ['Up', 'Up', 'Up', 'Up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>(?i)Up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.860041" elapsed="0.000447"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${up_count}) &gt;= 3</arg>
+<arg>${node} should have at least 3 BFD sessions up</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.860654" elapsed="0.000611"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:30.265386" elapsed="0.595932"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:31.459783" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.862000" elapsed="0.597828"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:31.459899" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:31.460069" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.861616" elapsed="0.598471"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:31.460451" level="INFO">${up_count} = ['Up', 'Up', 'Up', 'Up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>(?i)Up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:31.460231" elapsed="0.000238"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${up_count}) &gt;= 3</arg>
+<arg>${node} should have at least 3 BFD sessions up</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:31.460558" elapsed="0.000391"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:30.861452" elapsed="0.599537"/>
+</iter>
+<var>${node}</var>
+<value>spine1</value>
+<value>spine2</value>
+<status status="PASS" start="2026-06-22T17:53:30.265281" elapsed="1.195739"/>
+</for>
+<doc>Verify BFD sessions are established on spine nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:30.265011" elapsed="1.196181"/>
+</test>
+<test id="s1-t34" name="BFD Sessions Should Be Up On Leaf Nodes" line="237">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:32.053930" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:31.462038" elapsed="0.591936"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:32.054044" elapsed="0.000048"/>
+</return>
+<msg time="2026-06-22T17:53:32.054266" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:31.461826" elapsed="0.592462"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:32.054645" level="INFO">${up_count} = ['Up', 'Up', 'Up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>(?i)Up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.054434" elapsed="0.000229"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${up_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD sessions up (to spines)</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.054749" elapsed="0.000378"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:31.461707" elapsed="0.593452"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:32.662986" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.055608" elapsed="0.607426"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:32.663108" elapsed="0.000048"/>
+</return>
+<msg time="2026-06-22T17:53:32.663325" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.055385" elapsed="0.607960"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:32.663700" level="INFO">${up_count} = ['Up', 'Up', 'Up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>(?i)Up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.663486" elapsed="0.000232"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${up_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD sessions up (to spines)</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.663801" elapsed="0.000376"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:32.055267" elapsed="0.608957"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:33.265383" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.664733" elapsed="0.600691"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:33.265494" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:33.265673" level="INFO">${output} = VRF name: default
+-----------------
+DstAddr       MyDisc    YourDisc  Interface/Transport    Type           LastUp 
+--------- ----------- ----------- -------------------- ------- ----------------
+10.2...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bfd peers</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:32.664483" elapsed="0.601206"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:33.266020" level="INFO">${up_count} = ['Up', 'Up', 'Up']</msg>
+<var>${up_count}</var>
+<arg>${output}</arg>
+<arg>(?i)Up</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.265819" elapsed="0.000218"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>len(${up_count}) &gt;= 2</arg>
+<arg>${node} should have at least 2 BFD sessions up (to spines)</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.266116" elapsed="0.000387"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:32.664348" elapsed="0.602191"/>
+</iter>
+<var>${node}</var>
+<value>leaf1</value>
+<value>leaf2</value>
+<value>leaf3</value>
+<status status="PASS" start="2026-06-22T17:53:31.461584" elapsed="1.804983"/>
+</for>
+<doc>Verify BFD sessions are established on leaf nodes (spine-facing interfaces).</doc>
+<status status="PASS" start="2026-06-22T17:53:31.461336" elapsed="1.805318"/>
+</test>
+<test id="s1-t35" name="BGP Neighbors Should Have BFD Enabled On Spine1" line="245">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:33.889363" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:23, last write 00:00:06
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.267309" elapsed="0.622107"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:33.889506" elapsed="0.000053"/>
+</return>
+<msg time="2026-06-22T17:53:33.889720" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:23, last write 00:00:06
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>spine1</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.267113" elapsed="0.622633"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.890109" elapsed="0.000469"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.1</var>
+<status status="PASS" start="2026-06-22T17:53:33.889982" elapsed="0.000640"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.890960" elapsed="0.000383"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.3</var>
+<status status="PASS" start="2026-06-22T17:53:33.890829" elapsed="0.000547"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine1 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.891505" elapsed="0.000262"/>
+</kw>
+<var name="${neighbor_ip}">10.2.1.5</var>
+<status status="PASS" start="2026-06-22T17:53:33.891440" elapsed="0.000357"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{SPINE1_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:33.889819" elapsed="0.002002"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:33.892315" level="INFO">${bfd_count} = ['BFD is enabled', 'BFD is enabled', 'BFD is enabled']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BFD.*enabled</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.891929" elapsed="0.000406"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:33.892639" level="INFO">Length is 3.</msg>
+<arg>${bfd_count}</arg>
+<arg>3</arg>
+<arg>spine1 should have BFD enabled for 3 BGP neighbors</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.892415" elapsed="0.000256"/>
+</kw>
+<doc>Verify BFD is enabled for all BGP neighbors on spine1.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.266789" elapsed="0.625966"/>
+</test>
+<test id="s1-t36" name="BGP Neighbors Should Have BFD Enabled On Spine2" line="254">
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:34.501240" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:26, last write 00:00:13
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.893447" elapsed="0.607846"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:34.501381" elapsed="0.000054"/>
+</return>
+<msg time="2026-06-22T17:53:34.501596" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:26, last write 00:00:13
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>spine2</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.893251" elapsed="0.608370"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.501999" elapsed="0.000504"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.1</var>
+<status status="PASS" start="2026-06-22T17:53:34.501857" elapsed="0.000699"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.502751" elapsed="0.000353"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.3</var>
+<status status="PASS" start="2026-06-22T17:53:34.502651" elapsed="0.000493"/>
+</iter>
+<iter>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${neighbor_ip}</arg>
+<arg>spine2 BGP neighbor ${neighbor_ip} should be present</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.503316" elapsed="0.000350"/>
+</kw>
+<var name="${neighbor_ip}">10.2.2.5</var>
+<status status="PASS" start="2026-06-22T17:53:34.503233" elapsed="0.000475"/>
+</iter>
+<var>${neighbor_ip}</var>
+<value>@{SPINE2_NEIGHBORS}</value>
+<status status="PASS" start="2026-06-22T17:53:34.501694" elapsed="0.002046"/>
+</for>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:34.504351" level="INFO">${bfd_count} = ['BFD is enabled', 'BFD is enabled', 'BFD is enabled']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BFD.*enabled</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.503877" elapsed="0.000500"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:34.504787" level="INFO">Length is 3.</msg>
+<arg>${bfd_count}</arg>
+<arg>3</arg>
+<arg>spine2 should have BFD enabled for 3 BGP neighbors</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.504487" elapsed="0.000342"/>
+</kw>
+<doc>Verify BFD is enabled for all BGP neighbors on spine2.</doc>
+<status status="PASS" start="2026-06-22T17:53:33.892895" elapsed="0.612050"/>
+</test>
+<test id="s1-t37" name="BGP Neighbors Should Have BFD Enabled On Leaf Nodes" line="263">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:35.139071" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:07, last write 00:00:24
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.506101" elapsed="0.633022"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:35.139223" elapsed="0.000058"/>
+</return>
+<msg time="2026-06-22T17:53:35.139444" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:07, last write 00:00:24
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.505831" elapsed="0.633638"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:35.140075" level="INFO">${bfd_count} = ['BFD is enabled', 'BFD is enabled']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BFD.*enabled</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.139647" elapsed="0.000452"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:35.140619" level="INFO">Length is 2.</msg>
+<arg>${bfd_count}</arg>
+<arg>2</arg>
+<arg>${node} should have BFD enabled for 2 BGP neighbors</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.140217" elapsed="0.000447"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:34.505694" elapsed="0.635010"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:35.763693" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:25, last write 00:00:24
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.141275" elapsed="0.622515"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:35.763861" elapsed="0.000042"/>
+</return>
+<msg time="2026-06-22T17:53:35.764031" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:25, last write 00:00:24
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.140969" elapsed="0.623080"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:35.764473" level="INFO">${bfd_count} = ['BFD is enabled', 'BFD is enabled']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BFD.*enabled</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.764182" elapsed="0.000308"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:35.764856" level="INFO">Length is 2.</msg>
+<arg>${bfd_count}</arg>
+<arg>2</arg>
+<arg>${node} should have BFD enabled for 2 BGP neighbors</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.764568" elapsed="0.000318"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:35.140826" elapsed="0.624088"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:36.377063" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:09, last write 00:00:14
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.765541" elapsed="0.611570"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:36.377193" elapsed="0.000079"/>
+</return>
+<msg time="2026-06-22T17:53:36.377423" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:09, last write 00:00:14
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:35.765102" elapsed="0.612342"/>
+</kw>
+<kw name="Get Regexp Matches" owner="String">
+<msg time="2026-06-22T17:53:36.377878" level="INFO">${bfd_count} = ['BFD is enabled', 'BFD is enabled']</msg>
+<var>${bfd_count}</var>
+<arg>${output}</arg>
+<arg>(?i)BFD.*enabled</arg>
+<doc>Returns a list of all non-overlapping matches in the given string.</doc>
+<status status="PASS" start="2026-06-22T17:53:36.377580" elapsed="0.000317"/>
+</kw>
+<kw name="Length Should Be" owner="BuiltIn">
+<msg time="2026-06-22T17:53:36.378315" level="INFO">Length is 2.</msg>
+<arg>${bfd_count}</arg>
+<arg>2</arg>
+<arg>${node} should have BFD enabled for 2 BGP neighbors</arg>
+<doc>Verifies that the length of the given item is correct.</doc>
+<status status="PASS" start="2026-06-22T17:53:36.377983" elapsed="0.000371"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:35.765000" elapsed="0.613389"/>
+</iter>
+<var>${node}</var>
+<value>leaf1</value>
+<value>leaf2</value>
+<value>leaf3</value>
+<status status="PASS" start="2026-06-22T17:53:34.505571" elapsed="1.872849"/>
+</for>
+<doc>Verify BFD is enabled for BGP neighbors on all leaf nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:34.505141" elapsed="1.873371"/>
+</test>
+<test id="s1-t38" name="BGP Router-ID Should Be Set On All EOS Nodes" line="271">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:37.000287" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:26, last write 00:00:09
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:36.379380" elapsed="0.620951"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:37.000399" elapsed="0.000045"/>
+</return>
+<msg time="2026-06-22T17:53:37.000570" level="INFO">${output} = BGP neighbor is 10.2.1.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:26, last write 00:00:09
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:36.379160" elapsed="0.621428"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_rid}</arg>
+<arg>${node} should have router-id ${expected_rid}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.000722" elapsed="0.000423"/>
+</kw>
+<var name="${node}">spine1</var>
+<var name="${expected_rid}">10.0.1.1</var>
+<status status="PASS" start="2026-06-22T17:53:36.379044" elapsed="0.622143"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:37.601398" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:29, last write 00:00:17
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.001670" elapsed="0.599771"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:37.601512" elapsed="0.000041"/>
+</return>
+<msg time="2026-06-22T17:53:37.601680" level="INFO">${output} = BGP neighbor is 10.2.2.1, remote AS 65101, external link
+  BGP version 4, remote router ID 10.0.11.1, VRF default
+  Last read 00:00:29, last write 00:00:17
+  Hold time is 180, keepalive interval is 60...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.001442" elapsed="0.600257"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_rid}</arg>
+<arg>${node} should have router-id ${expected_rid}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.601833" elapsed="0.000425"/>
+</kw>
+<var name="${node}">spine2</var>
+<var name="${expected_rid}">10.0.2.1</var>
+<status status="PASS" start="2026-06-22T17:53:37.001313" elapsed="0.600988"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:38.201898" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:10, last write 00:00:27
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.602776" elapsed="0.599166"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:38.202011" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:38.202292" level="INFO">${output} = BGP neighbor is 10.2.1.0, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:10, last write 00:00:27
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:37.602555" elapsed="0.599759"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_rid}</arg>
+<arg>${node} should have router-id ${expected_rid}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.202449" elapsed="0.000395"/>
+</kw>
+<var name="${node}">leaf1</var>
+<var name="${expected_rid}">10.0.11.1</var>
+<status status="PASS" start="2026-06-22T17:53:37.602410" elapsed="0.600473"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:38.815157" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:28, last write 00:00:27
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.203339" elapsed="0.611888"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:38.815317" elapsed="0.000056"/>
+</return>
+<msg time="2026-06-22T17:53:38.815537" level="INFO">${output} = BGP neighbor is 10.2.1.2, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:28, last write 00:00:27
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.203102" elapsed="0.612460"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_rid}</arg>
+<arg>${node} should have router-id ${expected_rid}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.815727" elapsed="0.000486"/>
+</kw>
+<var name="${node}">leaf2</var>
+<var name="${expected_rid}">10.0.12.1</var>
+<status status="PASS" start="2026-06-22T17:53:38.202985" elapsed="0.613272"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:39.433933" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:12, last write 00:00:17
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.816799" elapsed="0.617183"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:39.434066" elapsed="0.000050"/>
+</return>
+<msg time="2026-06-22T17:53:39.434287" level="INFO">${output} = BGP neighbor is 10.2.1.4, remote AS 65001, external link
+  BGP version 4, remote router ID 10.0.1.1, VRF default
+  Last read 00:00:12, last write 00:00:17
+  Hold time is 180, keepalive interval is 60 ...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp neighbors</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:38.816520" elapsed="0.617791"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>${expected_rid}</arg>
+<arg>${node} should have router-id ${expected_rid}</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:39.434472" elapsed="0.000494"/>
+</kw>
+<var name="${node}">leaf3</var>
+<var name="${expected_rid}">10.0.13.1</var>
+<status status="PASS" start="2026-06-22T17:53:38.816384" elapsed="0.618645"/>
+</iter>
+<var>${node}</var>
+<var>${expected_rid}</var>
+<value>spine1</value>
+<value>10.0.1.1</value>
+<value>spine2</value>
+<value>10.0.2.1</value>
+<value>leaf1</value>
+<value>10.0.11.1</value>
+<value>leaf2</value>
+<value>10.0.12.1</value>
+<value>leaf3</value>
+<value>10.0.13.1</value>
+<status status="PASS" start="2026-06-22T17:53:36.378920" elapsed="3.056153"/>
+</for>
+<doc>Verify BGP router-id matches the loopback IP on all nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:36.378668" elapsed="3.056548"/>
+</test>
+<test id="s1-t39" name="BGP Address-Family IPv4 Should Be Active On Spine Nodes" line="278">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:40.044044" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.1.1, local AS number 65001
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+---...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:39.436635" elapsed="0.607463"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:40.044188" elapsed="0.000202"/>
+</return>
+<msg time="2026-06-22T17:53:40.044612" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.1.1, local AS number 65001
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+---...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp summary</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:39.436359" elapsed="0.608277"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>IPv4 Unicast</arg>
+<arg>${node} should have IPv4 Unicast address-family</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.044779" elapsed="0.000387"/>
+</kw>
+<var name="${node}">spine1</var>
+<status status="PASS" start="2026-06-22T17:53:39.436210" elapsed="0.609001"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:40.648476" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.2.1, local AS number 65002
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+---...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.045762" elapsed="0.602756"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:40.648589" elapsed="0.000041"/>
+</return>
+<msg time="2026-06-22T17:53:40.648757" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.2.1, local AS number 65002
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+---...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp summary</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.045481" elapsed="0.603296"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>IPv4 Unicast</arg>
+<arg>${node} should have IPv4 Unicast address-family</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.648907" elapsed="0.000396"/>
+</kw>
+<var name="${node}">spine2</var>
+<status status="PASS" start="2026-06-22T17:53:40.045343" elapsed="0.603999"/>
+</iter>
+<var>${node}</var>
+<value>spine1</value>
+<value>spine2</value>
+<status status="PASS" start="2026-06-22T17:53:39.435772" elapsed="1.213690"/>
+</for>
+<doc>Verify address-family ipv4 unicast is configured on spine nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:39.435394" elapsed="1.214173"/>
+</test>
+<test id="s1-t40" name="BGP Address-Family IPv4 Should Be Active On Leaf Nodes" line="285">
+<for flavor="IN">
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:41.268296" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.11.1, local AS number 65101
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.650483" elapsed="0.617853"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:41.268406" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:41.268575" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.11.1, local AS number 65101
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp summary</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.650256" elapsed="0.618336"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>IPv4 Unicast</arg>
+<arg>${node} should have IPv4 Unicast address-family</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.268711" elapsed="0.000367"/>
+</kw>
+<var name="${node}">leaf1</var>
+<status status="PASS" start="2026-06-22T17:53:40.650122" elapsed="0.619002"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:41.882893" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.12.1, local AS number 65102
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.269542" elapsed="0.613392"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:41.883006" elapsed="0.000043"/>
+</return>
+<msg time="2026-06-22T17:53:41.883175" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.12.1, local AS number 65102
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp summary</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.269334" elapsed="0.613859"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>IPv4 Unicast</arg>
+<arg>${node} should have IPv4 Unicast address-family</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.883343" elapsed="0.000369"/>
+</kw>
+<var name="${node}">leaf2</var>
+<status status="PASS" start="2026-06-22T17:53:41.269215" elapsed="0.614533"/>
+</iter>
+<iter>
+<kw name="Run Show Command" owner="NetlabCommon">
+<kw name="Run Show Command" owner="RTL">
+<msg time="2026-06-22T17:53:42.489350" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.13.1, local AS number 65103
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>${command}</arg>
+<doc>Keyword alias for netlab_connect_show.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.884178" elapsed="0.605214"/>
+</kw>
+<return>
+<value>${output}</value>
+<status status="PASS" start="2026-06-22T17:53:42.489462" elapsed="0.000040"/>
+</return>
+<msg time="2026-06-22T17:53:42.489629" level="INFO">${output} = BGP summary information for VRF default
+Router identifier 10.0.13.1, local AS number 65103
+Neighbor          AS Session State AFI/SAFI                AFI/SAFI State   NLRI Rcd   NLRI Acc   NLRI Adv
+--...</msg>
+<var>${output}</var>
+<arg>${node}</arg>
+<arg>bgp summary</arg>
+<doc>Run `netlab connect &lt;node&gt; --show &lt;cmd&gt;` and return output.</doc>
+<status status="PASS" start="2026-06-22T17:53:41.883953" elapsed="0.605694"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${output}</arg>
+<arg>IPv4 Unicast</arg>
+<arg>${node} should have IPv4 Unicast address-family</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2026-06-22T17:53:42.489776" elapsed="0.000384"/>
+</kw>
+<var name="${node}">leaf3</var>
+<status status="PASS" start="2026-06-22T17:53:41.883836" elapsed="0.606381"/>
+</iter>
+<var>${node}</var>
+<value>leaf1</value>
+<value>leaf2</value>
+<value>leaf3</value>
+<status status="PASS" start="2026-06-22T17:53:40.650012" elapsed="1.840236"/>
+</for>
+<doc>Verify address-family ipv4 unicast is configured on leaf nodes.</doc>
+<status status="PASS" start="2026-06-22T17:53:40.649732" elapsed="1.840608"/>
+</test>
+<test id="s1-t41" name="Lab Should Tear Down Successfully" line="292">
+<kw name="Netlab Down" owner="NetlabCommon">
+<kw name="Netlab Down" owner="RTL">
+<msg time="2026-06-22T17:53:44.073393" level="INFO">${rc} = 0</msg>
+<msg time="2026-06-22T17:53:44.073443" level="INFO">${stdout} = Checking virtualization provider installation
+OK: clab installed and working correctly
+Stopping clab nodes
+</msg>
+<msg time="2026-06-22T17:53:44.073469" level="INFO">${stderr} = 17:53:42 INFO Parsing &amp; checking topology file=clab.yml
+17:53:42 INFO Parsing &amp; checking topology file=clab.yml
+17:53:42 INFO Destroying lab name=netlab
+17:53:43 INFO Removed container name=clab-netla...</msg>
+<var>${rc}</var>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<arg>120</arg>
+<doc>Run `netlab down` to tear down the lab.</doc>
+<status status="PASS" start="2026-06-22T17:53:42.491009" elapsed="1.582478"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<arg>${rc} != 0</arg>
+<arg>Log</arg>
+<arg>netlab down returned rc=${rc}: ${stderr}</arg>
+<arg>WARN</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-06-22T17:53:44.073662" elapsed="0.000613"/>
+</kw>
+<doc>Tear down the lab via `netlab down`.</doc>
+<status status="PASS" start="2026-06-22T17:53:42.490823" elapsed="1.583525"/>
+</kw>
+<doc>Tear down the lab via netlab down.</doc>
+<status status="PASS" start="2026-06-22T17:53:42.490507" elapsed="1.583917"/>
+</test>
+<kw name="Netlab Down" owner="NetlabCommon" type="TEARDOWN">
+<kw name="Netlab Down" owner="RTL">
+<msg time="2026-06-22T17:53:44.503543" level="INFO">${rc} = 0</msg>
+<msg time="2026-06-22T17:53:44.503599" level="INFO">${stdout} = Checking virtualization provider installation
+OK: clab installed and working correctly
+Stopping clab nodes
+</msg>
+<msg time="2026-06-22T17:53:44.503626" level="INFO">${stderr} = 17:53:44 INFO Parsing &amp; checking topology file=clab.yml
+17:53:44 INFO no containerlab containers found
+</msg>
+<var>${rc}</var>
+<var>${stdout}</var>
+<var>${stderr}</var>
+<arg>120</arg>
+<doc>Run `netlab down` to tear down the lab.</doc>
+<status status="PASS" start="2026-06-22T17:53:44.075064" elapsed="0.428580"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<arg>${rc} != 0</arg>
+<arg>Log</arg>
+<arg>netlab down returned rc=${rc}: ${stderr}</arg>
+<arg>WARN</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2026-06-22T17:53:44.503817" elapsed="0.000408"/>
+</kw>
+<doc>Tear down the lab via `netlab down`.</doc>
+<status status="PASS" start="2026-06-22T17:53:44.074914" elapsed="0.429384"/>
+</kw>
+<doc>Runtime tests for eBGP underlay — validates:
+- Lab lifecycle (netlab up / netlab down)
+- Node version and reachability
+- Interface status (up/up)
+- BGP neighbors (Established)
+- BGP route exchange (all loopbacks learned)
+- BFD configuration and sessions
+- BGP router-id and address-family
+- End-to-end ping (spine-to-leaf, leaf-to-leaf, leaf-to-spine, host-to-all)</doc>
+<status status="FAIL" start="2026-06-22T17:51:35.364776" elapsed="129.139739"/>
+</suite>
+<statistics>
+<total>
+<stat pass="33" fail="8" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat name="Test Ebgp" id="s1" pass="33" fail="8" skip="0">Test Ebgp</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
