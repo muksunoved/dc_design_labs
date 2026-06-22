@@ -15,8 +15,11 @@ output.xml
 log.html
 report.html
 
-# Qwen Code
-.qwen/
+# Except lab_04 test results — keep them in version control
+!source/lab_04/tests/output/
+!source/lab_04/tests/output/*
+
+
 
 # IDE
 .idea/
