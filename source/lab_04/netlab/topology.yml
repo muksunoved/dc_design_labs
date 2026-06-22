@@ -1,0 +1,60 @@
+# Netlab CLOS Topology: 2 Spine + 3 Leaf + 3 Hosts (containerlab ubuntu)
+# Provider: containerlab | Devices: Arista EOS (spine/leaf), Linux (hosts)
+# BGP: eBGP between spine and leaf nodes. Each node has a unique ASN.
+# IP addresses are loaded from ip-plan.yml by the ipplan plugin.
+
+defaults:
+  provider: clab
+  outputs:
+    graph:
+      interface_labels: True
+
+plugin: [files, ipplan]
+
+groups:
+  spine:
+    device: eos
+    module: [bgp]
+    config: [spine, bfd]
+    members: [spine1, spine2]
+    clab:
+      image: "ceos:4.34.2.2F"
+
+  leaf:
+    device: eos
+    module: [bgp]
+    config: [leaf, bfd]
+    members: [leaf1, leaf2, leaf3]
+    clab:
+      image: "ceos:4.34.2.2F"
+
+  hosts:
+    device: linux
+    members: [host1, host2, host3]
+    clab:
+      image: "ubuntu:22.04"
+
+nodes:
+  spine1:
+    bgp.as: 65001
+
+  spine2:
+    bgp.as: 65002
+
+  leaf1:
+    bgp.as: 65101
+
+  leaf2:
+    bgp.as: 65102
+
+  leaf3:
+    bgp.as: 65103
+
+  host1:
+    clab.binds: [host1.sh:/config/startup.sh]
+
+  host2:
+    clab.binds: [host2.sh:/config/startup.sh]
+
+  host3:
+    clab.binds: [host3.sh:/config/startup.sh]

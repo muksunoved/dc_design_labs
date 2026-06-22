@@ -1,0 +1,22 @@
+{# Leaf configuration template for Arista EOS #}
+!
+ip routing
+!
+interface Loopback0
+  ip address {{ loopback.ipv4 }}
+!
+{% for iface in interfaces %}
+interface {{ iface.ifname }}
+  no switchport
+  ip address {{ iface.ipv4 }}
+  no shutdown
+!
+{% endfor %}
+router bgp {{ bgp.as }}
+  maximum-paths 4
+{% for neighbor in bgp.neighbors %}
+  neighbor {{ neighbor.ipv4 }} remote-as {{ neighbor.as }}
+  neighbor {{ neighbor.ipv4 }} bfd
+{% endfor %}
+  redistribute connected
+!

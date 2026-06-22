@@ -1,0 +1,7 @@
+{# BFD Configuration Template — interface-level BFD only #}
+{# neighbor bfd is configured in spine.j2 / leaf.j2 #}
+{% for iface in interfaces %}
+interface {{ iface.ifname }}
+  bfd interval 100 min_rx 100 multiplier 3
+!
+{% endfor %}

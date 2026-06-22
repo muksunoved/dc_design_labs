@@ -5,6 +5,7 @@
 - [Практическая работа 1 - Проектирование адресного пространства](source/lab_01/README.md)
 - [Практическая работа 2 - Underlay OSPF](source/lab_02/README.md)
 - [Практическая работа 3 - Underlay IS-IS](source/lab_03/README.md)
+- [Практическая работа 4 - Underlay eBGP](source/lab_04/README.md)
 
 ---
 

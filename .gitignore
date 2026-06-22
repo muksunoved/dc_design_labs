@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Netlab generated artifacts (per-lab)
+netlab.lock
+netlab.snapshot.pickle
+group_vars/
+host_vars/
+node_files/
+
+# Robot Framework output files
+output.xml
+log.html
+report.html
+
+# Except lab_04 test results — keep them in version control
+!source/lab_04/tests/output/
+!source/lab_04/tests/output/*
+
+
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
