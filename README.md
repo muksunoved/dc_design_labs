@@ -6,6 +6,7 @@
 - [Практическая работа 2 - Underlay OSPF](source/lab_02/README.md)
 - [Практическая работа 3 - Underlay IS-IS](source/lab_03/README.md)
 - [Практическая работа 4 - Underlay eBGP](source/lab_04/README.md)
+- [Практическая работа 5 - Overlay VxLAN EVPN для L2 связанности](source/lab_05/README.md)
 
 ---
 

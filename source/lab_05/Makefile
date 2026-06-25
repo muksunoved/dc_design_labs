@@ -5,7 +5,7 @@ NETLAB_DIR := netlab
 TEST_DIR   := tests
 OUTPUT_DIR := $(TEST_DIR)/output
 
-.PHONY: up down restart test test-verbose clean status connect
+.PHONY: up down restart test test-verbose clean status connect graph
 
 ## Start the lab (containers + config push)
 up:
@@ -25,6 +25,10 @@ status:
 ## Connect to a node (usage: make connect NODE=spine1)
 connect:
 	cd $(NETLAB_DIR) && netlab connect $(NODE)
+
+## Generate topology diagram (requires graphviz)
+graph:
+	cd $(NETLAB_DIR) && netlab graph img/topology.dot && python3 render_topology.py
 
 ## Run all Robot Framework tests
 test: $(OUTPUT_DIR)
@@ -46,6 +50,10 @@ $(OUTPUT_DIR):
 clean:
 	rm -rf $(OUTPUT_DIR)
 
+## Clean everything: test outputs, generated dot files, topology image
+clean-all: clean
+	rm -rf $(NETLAB_DIR)/img $(NETLAB_DIR)/*.styled.dot images/topology.png
+
 ## Show help
 help:
 	@echo "lab_05 — VXLAN EVPN overlay lab"
@@ -56,8 +64,10 @@ help:
 	@echo "  restart       Restart the lab"
 	@echo "  status        Show lab status"
 	@echo "  connect NODE  Connect to a node (e.g. make connect NODE=spine1)"
+	@echo "  graph         Generate topology diagram (requires graphviz)"
 	@echo "  test          Run all Robot Framework tests"
 	@echo "  test-verbose  Run tests with DEBUG log level"
 	@echo '  test-one TEST Run a single test (e.g. make test-one TEST="Host1 Should Ping Host2")'
 	@echo "  clean         Remove test outputs"
+	@echo "  clean-all     Remove test outputs + generated graph files"
 	@echo "  help          Show this help"

@@ -52,13 +52,13 @@ leaf3:
       remote: 10.3.3.1/31
 
 host1:
-  loopback: 10.0.21.1/32
+  loopback: 10.0.21.1/32  # UNUSED in this lab — reserved for future L3 EVPN / IRB labs
 
 host2:
-  loopback: 10.0.22.1/32
+  loopback: 10.0.22.1/32  # UNUSED in this lab — reserved for future L3 EVPN / IRB labs
 
 host3:
-  loopback: 10.0.23.1/32
+  loopback: 10.0.23.1/32  # UNUSED in this lab — reserved for future L3 EVPN / IRB labs
 
 # Overlay parameters — used by custom Jinja2 templates
 overlay:
