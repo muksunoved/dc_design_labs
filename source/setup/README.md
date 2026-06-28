@@ -239,4 +239,53 @@ $ netlab graph topo_labeled.png
 $ netlab down
 ```
 
+##### Запуск в режиме password-free Containerlab (для тестов rotot framework)
+
+```bash
+
+# Убедится что установлен флаг setuid-root
+sudo chmod u+s $(command -v containerlab)
+
+# Создать и добавить себя в группу
+sudo groupadd -r clab_admins         # safe to repeat
+sudo usermod -aG docker,clab_admins $USER
+
+# Применить изменения
+newgrp clab_admins
+```
+
+###### Убедится что работает
+
+```bash
+containerlab version
+```
+
+Вы должны увидеть **вывод версии без приглашения sudo**.
+
+###### Заставляем netlab не пользоваться sudo при старте/остановке
+
+По умолчанию, `netlab` оборачивает вызовы Containerlab в `sudo`. Отменим это:
+
+```bash
+netlab defaults --user \
+  providers.clab.start='containerlab deploy --reconfigure -t clab.yml'
+
+netlab defaults --user \
+  providers.clab.stop='containerlab destroy --cleanup -t clab.yml'
+```
+
+> [!note] Примечание
+> Эти команды записывают данные в файл ~/.netlab.yml, используя правильную структуру ключей. Не включайте значения по умолчанию в YAML-файлы пользовательского уровня — они будут проигнорированы.
+
+###### Проверяем:
+
+```bash
+netlab show defaults providers.clab.start
+# должны увидеть: containerlab deploy --reconfigure -t clab.yml
+```
+[Источник](https://docs.neops.io/neops-remote-lab/docs/40-deployment/10-netlab-host-setup/#2-configure-rootless-containerlab)
+
+
+
+
 

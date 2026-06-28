@@ -9,6 +9,10 @@ Library          Collections
 Library          String
 Library          re
 
+Suite Setup      Run Keywords
+...              Check Rootless Prerequisites    AND
+...              Load IP Plan Variables    AND
+...              Netlab Up
 Suite Teardown   Netlab Down
 
 *** Test Cases ***
@@ -18,9 +22,9 @@ Suite Teardown   Netlab Down
 # ============================================================================
 
 Lab Should Start Successfully
-    [Documentation]    Deploy the lab via netlab up and wait for BGP+EVPN to stabilize.
-    Netlab Up
+    [Documentation]    Lab is deployed via Suite Setup. Wait for EVPN routes to propagate.
     Sleep    15s    Wait for EVPN routes to propagate
+    Log    Lab started successfully via Suite Setup
 
 # ============================================================================
 # Underlay: Node status and interfaces
@@ -52,7 +56,8 @@ All Data Interfaces Should Be Up On Leaf Nodes
 
 Loopback0 Should Have Correct IP On All EOS Nodes
     [Documentation]    Verify Loopback0 IP matches the IP plan.
-    FOR    ${node}    ${expected_ip}    IN    &{LOOPBACK_IPS}
+    ${items}=    RTL.Get Loopback Ips
+    FOR    ${node}    ${expected_ip}    IN    @{items}
         ${output}=    Run Show Command    ${node}    ip interface brief
         Should Contain    ${output}    ${expected_ip}    ${node} Loopback0 should be ${expected_ip}
     END
@@ -75,7 +80,8 @@ Vxlan1 Interface Should Be Up On All Leaf Nodes
 
 Vxlan1 Source Interface Should Match VTEP IP
     [Documentation]    Verify VxLAN1 source-interface is Loopback0 with correct VTEP IP.
-    FOR    ${node}    ${vtep_ip}    IN    &{VTEP_IPS}
+    ${items}=    RTL.Get Vtep Ips
+    FOR    ${node}    ${vtep_ip}    IN    @{items}
         ${result}=    RTL.Check Vxlan Source Interface    ${node}    ${vtep_ip}
         Should Be True    ${result}    ${node} Vxlan1 source should be ${vtep_ip}
     END
@@ -102,11 +108,9 @@ BGP IPv4 Sessions Should Be Established On Spine Nodes
     [Documentation]    Verify all eBGP IPv4 sessions are Established on spines.
     FOR    ${node}    IN    @{SPINE_NODES}
         ${output}=    Run Show Command    ${node}    ip bgp summary
-        FOR    ${neighbor}    IN    @{SPINE1_NEIGHBORS}    @{SPINE2_NEIGHBORS}
-            Run Keyword If    '${node}' == 'spine1' and '${neighbor}' in @{SPINE1_NEIGHBORS}
-            ...    Should Contain    ${output}    Estab    ${node} neighbor ${neighbor} should be Established
-            Run Keyword If    '${node}' == 'spine2' and '${neighbor}' in @{SPINE2_NEIGHBORS}
-            ...    Should Contain    ${output}    Estab    ${node} neighbor ${neighbor} should be Established
+        ${neighbors}=    RTL.Get Spine Neighbors    ${node}
+        FOR    ${neighbor}    IN    @{neighbors}
+            Should Contain    ${output}    Estab    ${node} neighbor ${neighbor} should be Established
         END
     END
 
@@ -197,7 +201,8 @@ EVPN Route Targets Should Match Overlay RT
 
 EVPN RD Should Match VTEP IP Format
     [Documentation]    Verify EVPN RD format is <VTEP_IP>:<VNI> on leafs.
-    FOR    ${node}    ${vtep_ip}    IN    &{VTEP_IPS}
+    ${items}=    RTL.Get Vtep Ips
+    FOR    ${node}    ${vtep_ip}    IN    @{items}
         ${expected_rd}=    Catenate    SEPARATOR=:    ${vtep_ip}    ${OVERLAY_VNI}
         ${output}=    Run Show Command    ${node}    bgp evpn route-type imet detail
         Should Contain    ${output}    ${expected_rd}    ${node} EVPN RD should be ${expected_rd}
@@ -207,8 +212,8 @@ Spine Should Preserve EVPN Next Hop Unchanged
     [Documentation]    Verify spine preserves original VTEP next-hop (next-hop-unchanged).
     # Check that spine EVPN routes have leaf VTEP IPs as next-hop, not spine IPs
     ${output}=    Run Show Command    spine1    bgp evpn
-    Should Contain    ${output}    10.0.12.1    spine1 should show leaf2 VTEP as next-hop
-    Should Contain    ${output}    10.0.13.1    spine1 should show leaf3 VTEP as next-hop
+    Should Contain    ${output}    ${VTEP_IPS}[leaf2]    spine1 should show leaf2 VTEP as next-hop
+    Should Contain    ${output}    ${VTEP_IPS}[leaf3]    spine1 should show leaf3 VTEP as next-hop
 
 # ============================================================================
 # Overlay: VXLAN data-plane
@@ -249,54 +254,54 @@ Host Facing Interfaces Should Be Switchport Access VLAN 10
 # ============================================================================
 
 Host1 Should Have Overlay IP
-    [Documentation]    Verify host1 has overlay IP 192.168.10.11.
+    [Documentation]    Verify host1 has overlay IP from ip-plan.yml.
     ${output}=    Run Host Command    host1    ip addr show eth1
-    Should Contain    ${output}    192.168.10.11    host1 should have overlay IP
+    Should Contain    ${output}    ${HOST_OVERLAY_IPS}[host1]    host1 should have overlay IP
 
 Host2 Should Have Overlay IP
-    [Documentation]    Verify host2 has overlay IP 192.168.10.12.
+    [Documentation]    Verify host2 has overlay IP from ip-plan.yml.
     ${output}=    Run Host Command    host2    ip addr show eth1
-    Should Contain    ${output}    192.168.10.12    host2 should have overlay IP
+    Should Contain    ${output}    ${HOST_OVERLAY_IPS}[host2]    host2 should have overlay IP
 
 Host3 Should Have Overlay IP
-    [Documentation]    Verify host3 has overlay IP 192.168.10.13.
+    [Documentation]    Verify host3 has overlay IP from ip-plan.yml.
     ${output}=    Run Host Command    host3    ip addr show eth1
-    Should Contain    ${output}    192.168.10.13    host3 should have overlay IP
+    Should Contain    ${output}    ${HOST_OVERLAY_IPS}[host3]    host3 should have overlay IP
 
 Host1 Should Ping Host2 Through Overlay
     [Documentation]    Verify L2 connectivity: host1 → host2 through VXLAN overlay.
-    ${output}=    Run Host Ping    host1    192.168.10.12
+    ${output}=    Run Host Ping    host1    ${HOST_OVERLAY_IPS}[host2]
     Should Contain    ${output}    64 bytes    host1 should ping host2 through overlay
 
 Host1 Should Ping Host3 Through Overlay
     [Documentation]    Verify L2 connectivity: host1 → host3 through VXLAN overlay.
-    ${output}=    Run Host Ping    host1    192.168.10.13
+    ${output}=    Run Host Ping    host1    ${HOST_OVERLAY_IPS}[host3]
     Should Contain    ${output}    64 bytes    host1 should ping host3 through overlay
 
 Host2 Should Ping Host3 Through Overlay
     [Documentation]    Verify L2 connectivity: host2 → host3 through VXLAN overlay.
-    ${output}=    Run Host Ping    host2    192.168.10.13
+    ${output}=    Run Host Ping    host2    ${HOST_OVERLAY_IPS}[host3]
     Should Contain    ${output}    64 bytes    host2 should ping host3 through overlay
 
 Host2 Should Ping Host1 Through Overlay
     [Documentation]    Verify L2 connectivity: host2 → host1 (bidirectional).
-    ${output}=    Run Host Ping    host2    192.168.10.11
+    ${output}=    Run Host Ping    host2    ${HOST_OVERLAY_IPS}[host1]
     Should Contain    ${output}    64 bytes    host2 should ping host1 through overlay
 
 Host3 Should Ping Host1 Through Overlay
     [Documentation]    Verify L2 connectivity: host3 → host1 (bidirectional).
-    ${output}=    Run Host Ping    host3    192.168.10.11
+    ${output}=    Run Host Ping    host3    ${HOST_OVERLAY_IPS}[host1]
     Should Contain    ${output}    64 bytes    host3 should ping host1 through overlay
 
 Host3 Should Ping Host2 Through Overlay
     [Documentation]    Verify L2 connectivity: host3 → host2 (bidirectional).
-    ${output}=    Run Host Ping    host3    192.168.10.12
+    ${output}=    Run Host Ping    host3    ${HOST_OVERLAY_IPS}[host2]
     Should Contain    ${output}    64 bytes    host3 should ping host2 through overlay
 
 EVPN MAC Addresses Should Be Learned From Hosts
     [Documentation]    After host ping, verify MAC addresses are learned via EVPN.
     # Trigger MAC learning by ping
-    Run Host Ping    host1    192.168.10.12    count=1
+    Run Host Ping    host1    ${HOST_OVERLAY_IPS}[host2]    count=1
     Sleep    5s    Wait for EVPN MAC propagation
     FOR    ${node}    IN    @{LEAF_NODES}
         ${count}=    RTL.Get Vxlan Mac Count    ${node}
@@ -308,17 +313,17 @@ EVPN MAC Addresses Should Be Learned From Hosts
 # ============================================================================
 
 Spine1 Should Ping Leaf1 Loopback
-    ${output}=    Run Ping Command    spine1    10.0.11.1    Loopback0
+    ${output}=    Run Ping Command    spine1    ${VTEP_IPS}[leaf1]    Loopback0
     Should Contain    ${output}    0% packet loss    spine1 should ping leaf1 loopback
 
 Spine1 Should Ping Leaf2 Loopback
-    ${output}=    Run Ping Command    spine1    10.0.12.1    Loopback0
+    ${output}=    Run Ping Command    spine1    ${VTEP_IPS}[leaf2]    Loopback0
     Should Contain    ${output}    0% packet loss    spine1 should ping leaf2 loopback
 
 Leaf1 Should Ping Leaf2 Loopback
-    ${output}=    Run Ping Command    leaf1    10.0.12.1    Loopback0
+    ${output}=    Run Ping Command    leaf1    ${VTEP_IPS}[leaf2]    Loopback0
     Should Contain    ${output}    0% packet loss    leaf1 should ping leaf2 loopback
 
 Leaf1 Should Ping Leaf3 Loopback
-    ${output}=    Run Ping Command    leaf1    10.0.13.1    Loopback0
+    ${output}=    Run Ping Command    leaf1    ${VTEP_IPS}[leaf3]    Loopback0
     Should Contain    ${output}    0% packet loss    leaf1 should ping leaf3 loopback

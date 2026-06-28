@@ -26,6 +26,7 @@ report.html
 .vscode/
 *.swp
 *~
+.qwen/
 
 # OS
 .DS_Store

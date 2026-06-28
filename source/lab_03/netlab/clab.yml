@@ -1,0 +1,60 @@
+name: netlab
+prefix: "clab"
+
+mgmt:
+  network: netlab_mgmt
+  ipv4-subnet: 192.168.121.0/24
+  # Note: 'start' not validated
+topology:
+  nodes:
+    spine1:
+      mgmt-ipv4: 192.168.121.101
+      kind: ceos
+      env: {'INTFTYPE': 'et', 'CLAB_MGMT_VRF': 'management'}
+      image: ceos:4.34.2.2F
+      runtime: docker
+    spine2:
+      mgmt-ipv4: 192.168.121.102
+      kind: ceos
+      env: {'INTFTYPE': 'et', 'CLAB_MGMT_VRF': 'management'}
+      image: ceos:4.34.2.2F
+      runtime: docker
+    leaf1:
+      mgmt-ipv4: 192.168.121.103
+      kind: ceos
+      env: {'INTFTYPE': 'et', 'CLAB_MGMT_VRF': 'management'}
+      image: ceos:4.34.2.2F
+      runtime: docker
+    leaf2:
+      mgmt-ipv4: 192.168.121.104
+      kind: ceos
+      env: {'INTFTYPE': 'et', 'CLAB_MGMT_VRF': 'management'}
+      image: ceos:4.34.2.2F
+      runtime: docker
+    leaf3:
+      mgmt-ipv4: 192.168.121.105
+      kind: ceos
+      env: {'INTFTYPE': 'et', 'CLAB_MGMT_VRF': 'management'}
+      image: ceos:4.34.2.2F
+      runtime: docker
+
+
+  links:
+  - endpoints:
+    - "spine1:et1"
+    - "leaf1:et1"
+  - endpoints:
+    - "spine1:et2"
+    - "leaf2:et1"
+  - endpoints:
+    - "spine1:et3"
+    - "leaf3:et1"
+  - endpoints:
+    - "spine2:et1"
+    - "leaf1:et2"
+  - endpoints:
+    - "spine2:et2"
+    - "leaf2:et2"
+  - endpoints:
+    - "spine2:et3"
+    - "leaf3:et2"

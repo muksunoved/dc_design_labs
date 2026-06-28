@@ -11,12 +11,195 @@ import os
 import subprocess
 import time
 from pathlib import Path
+import yaml
+
+SETUP_README_URL = (
+    "https://github.com/muksunoved/dc_design_labs/blob/main/source/setup/README.md"
+    "#запуск-в-режиме-password-free-containerlab-для-тестов-rotot-framework"
+)
 
 
 class NetlabRuntimeLibrary:
     """Robot Framework library for runtime validation via netlab connect."""
 
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
+
+    def __init__(self):
+        """Initialize and load IP plan from ip-plan.yml."""
+        self._ip_plan = None
+
+    def load_ip_plan(self):
+        """Load IP plan from ip-plan.yml and return as dictionary.
+
+        Returns:
+            Dictionary with structure:
+            - loopback_ips: {node: ip_with_prefix}
+            - vtep_ips: {node: ip_without_prefix}
+            - host_overlay_ips: {host: ip_without_prefix}
+            - neighbors: {node: [remote_ips]}
+            - overlay: {vlan, vni, rt, subnet}
+        """
+        ip_plan_path = self.project_dir / 'netlab' / 'ip-plan.yml'
+        with open(ip_plan_path) as f:
+            ip_plan = yaml.safe_load(f)
+
+        result = {
+            'loopback_ips': {},
+            'vtep_ips': {},
+            'host_overlay_ips': {},
+            'neighbors': {},
+            'overlay': {}
+        }
+
+        # Extract loopback and neighbor IPs
+        for node, data in ip_plan.items():
+            if node == 'overlay':
+                continue
+
+            if 'loopback' in data:
+                result['loopback_ips'][node] = data['loopback']
+                # VTEP IPs are loopback without prefix
+                if node.startswith('leaf'):
+                    vtep_ip = data['loopback'].split('/')[0]
+                    result['vtep_ips'][node] = vtep_ip
+
+            if 'links' in data:
+                result['neighbors'][node] = []
+                for peer, link_data in data['links'].items():
+                    if 'remote' in link_data:
+                        result['neighbors'][node].append(link_data['remote'])
+
+        # Extract overlay parameters
+        if 'overlay' in ip_plan:
+            overlay = ip_plan['overlay']
+
+            if 'vlans' in overlay:
+                for vlan_id, vlan_data in overlay['vlans'].items():
+                    result['overlay']['vlan'] = vlan_id
+                    result['overlay']['vni'] = vlan_data.get('vni')
+                    result['overlay']['rt'] = vlan_data.get('rt')
+                    result['overlay']['subnet'] = vlan_data.get('subnet')
+                    break
+
+            if 'hosts' in overlay:
+                for host, ip_with_prefix in overlay['hosts'].items():
+                    ip_without_prefix = ip_with_prefix.split('/')[0]
+                    result['host_overlay_ips'][host] = ip_without_prefix
+
+        self._ip_plan = result
+        return result
+
+    def get_ip_plan_variable(self, category, key=None):
+        """Get specific value from loaded IP plan.
+
+        Args:
+            category: 'loopback_ips', 'vtep_ips', 'host_overlay_ips', 'neighbors', 'overlay'
+            key: Optional key within category
+
+        Returns:
+            Value or entire category dict if key is None
+        """
+        if self._ip_plan is None:
+            self.load_ip_plan()
+
+        if category not in self._ip_plan:
+            raise KeyError(f"Unknown IP plan category: {category}")
+
+        if key is None:
+            return self._ip_plan[category]
+
+        if key not in self._ip_plan[category]:
+            raise KeyError(f"Key '{key}' not found in category '{category}'")
+
+        return self._ip_plan[category][key]
+
+    def get_loopback_ips(self):
+        """Return loopback_ips as flat list [node, ip, ...] for EOS nodes only."""
+        if self._ip_plan is None:
+            self.load_ip_plan()
+        result = []
+        for k, v in self._ip_plan['loopback_ips'].items():
+            if k.startswith(('spine', 'leaf')):
+                result.extend([k, v])
+        return result
+
+    def get_vtep_ips(self):
+        """Return vtep_ips as flat list [node, ip, node, ip, ...] for RF FOR iteration."""
+        if self._ip_plan is None:
+            self.load_ip_plan()
+        result = []
+        for k, v in self._ip_plan['vtep_ips'].items():
+            result.extend([k, v])
+        return result
+
+    def get_spine_neighbors(self, spine):
+        """Return list of neighbor IPs for a spine node."""
+        if self._ip_plan is None:
+            self.load_ip_plan()
+        return self._ip_plan['neighbors'].get(spine, [])
+
+    def check_rootless_prerequisites(self):
+        """Verify that the current user can run containerlab without sudo.
+
+        Checks:
+        1. User is in 'docker' and 'clab_admins' groups
+        2. 'containerlab' binary has setuid bit
+        3. 'netlab' is configured to run containerlab without sudo
+
+        Raises AssertionError with a link to setup/README.md if any check fails.
+        """
+        import grp
+        import shutil
+        import stat
+
+        errors = []
+
+        # 1. Check groups
+        username = os.environ.get('USER', os.path.basename(os.path.expanduser('~')))
+        try:
+            user_groups = [g.gr_name for g in grp.getgrall() if username in g.gr_mem]
+        except Exception:
+            user_groups = []
+
+        for required_group in ('docker', 'clab_admins'):
+            if required_group not in user_groups:
+                errors.append(
+                    f"User '{username}' is not in group '{required_group}'. "
+                    f"Run: sudo usermod -aG {required_group} $USER && newgrp {required_group}"
+                )
+
+        # 2. Check setuid bit on containerlab
+        clab_path = shutil.which('containerlab')
+        if clab_path:
+            mode = os.stat(clab_path).st_mode
+            if not (mode & stat.S_ISUID):
+                errors.append(
+                    f"containerlab ({clab_path}) does not have setuid bit. "
+                    f"Run: sudo chmod u+s $(command -v containerlab)"
+                )
+        else:
+            errors.append("containerlab binary not found in PATH")
+
+        # 3. Check netlab defaults for rootless operation
+        netlab_start = subprocess.run(
+            ['netlab', 'show', 'defaults', 'providers.clab.start'],
+            capture_output=True, text=True, timeout=10
+        ).stdout.strip()
+        if 'sudo' in netlab_start or 'containerlab deploy' not in netlab_start:
+            errors.append(
+                "netlab is configured to use sudo for containerlab. "
+                "Run:\n"
+                "  netlab defaults --user providers.clab.start='containerlab deploy --reconfigure -t clab.yml'\n"
+                "  netlab defaults --user providers.clab.stop='containerlab destroy --cleanup -t clab.yml'"
+            )
+
+        if errors:
+            msg = (
+                "Rootless containerlab prerequisites not met:\n"
+                + "\n".join(f"  • {e}" for e in errors)
+                + f"\n\nSee setup guide: {SETUP_README_URL}"
+            )
+            raise AssertionError(msg)
 
     @property
     def project_dir(self):
@@ -361,6 +544,102 @@ class NetlabRuntimeLibrary:
     def run_host_show_ip(self, host):
         """Show IP addresses on a Linux host container."""
         return self.run_host_command(host, 'ip addr')
+
+    # -- packet capture ----------------------------------------------------------
+
+    def capture_packets(self, node, interface, bpf_filter, count, timeout=30):
+        """Capture packets on a node interface using docker exec + tcpdump.
+
+        Uses docker exec instead of `netlab capture` because the latter requires
+        interactive sudo password input, which is incompatible with headless tests.
+
+        Args:
+            node: Device name (e.g. leaf1, host1).
+            interface: Interface name inside the container (et1, eth1, etc.).
+                       Use 'any' to capture on all interfaces.
+            bpf_filter: BPF filter expression (e.g. 'udp port 4789').
+            count: Number of packets to capture.
+            timeout: Max wait time in seconds.
+
+        Returns:
+            Parsed packet descriptions from tcpdump -r (one line per packet).
+        """
+        container = self.get_container_name(node)
+        pcap_path = f'/tmp/netlab_test_{int(time.time())}.pcap'
+        capture_cmd = [
+            'docker', 'exec', container, 'bash', '-c',
+            f'tcpdump -i {interface} -c {count} -w {pcap_path} "{bpf_filter}"'
+        ]
+        proc = subprocess.Popen(
+            capture_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        try:
+            proc.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            raise TimeoutError(
+                f'Packet capture timed out after {timeout}s on {node}/{interface}'
+            )
+
+        read_cmd = [
+            'docker', 'exec', container, 'bash', '-c',
+            f'tcpdump -r {pcap_path} -nn 2>/dev/null'
+        ]
+        result = subprocess.run(read_cmd, capture_output=True, text=True, timeout=15)
+        return result.stdout.strip()
+
+    def capture_packets_verbose(self, node, interface, bpf_filter, count, timeout=30, src_mac=None):
+        """Capture packets with verbose tcpdump output (-v flag).
+
+        Args:
+            src_mac: Optional source MAC address filter — prepends
+                     'ether src <mac> and' to the BPF filter.
+            Other args same as capture_packets.
+
+        Returns:
+            Verbose packet descriptions with TLV details.
+        """
+        container = self.get_container_name(node)
+        pcap_path = f'/tmp/netlab_test_v_{int(time.time())}.pcap'
+        if src_mac:
+            bpf_filter = f'ether src {src_mac} and {bpf_filter}'
+        capture_cmd = [
+            'docker', 'exec', container, 'bash', '-c',
+            f'tcpdump -i {interface} -c {count} -w {pcap_path} "{bpf_filter}"'
+        ]
+        proc = subprocess.Popen(
+            capture_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        try:
+            proc.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            raise TimeoutError(
+                f'Packet capture timed out after {timeout}s on {node}/{interface}'
+            )
+
+        read_cmd = [
+            'docker', 'exec', container, 'bash', '-c',
+            f'tcpdump -r {pcap_path} -nn -v 2>/dev/null'
+        ]
+        result = subprocess.run(read_cmd, capture_output=True, text=True, timeout=15)
+        return result.stdout.strip()
+
+    def bounce_interface(self, node, interface, wait_down=5, wait_up=3):
+        """Shutdown then no-shutdown an interface on an EOS node via SSH.
+
+        Args:
+            node: EOS device name (e.g. leaf1).
+            interface: Interface name (e.g. Ethernet3).
+            wait_down: Seconds to wait after shutdown.
+            wait_up: Seconds to wait after no-shutdown.
+        """
+        cmd_down = f'configure\ninterface {interface}\nshutdown\nend'
+        cmd_up = f'configure\ninterface {interface}\nno shutdown\nend'
+        self.run_cli_command(node, cmd_down)
+        time.sleep(wait_down)
+        self.run_cli_command(node, cmd_up)
+        time.sleep(wait_up)
 
     # -- EVPN-specific helpers ---------------------------------------------------
 

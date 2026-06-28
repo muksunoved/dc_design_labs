@@ -4,6 +4,7 @@ Netlab plugin: ipplan
 Reads IP addresses from ip-plan.yml and populates:
 - topology.nodes.<name>.loopback.ipv4
 - topology.links with IP addresses and graph labels
+- host*.sh startup scripts with overlay IP addresses
 
 Usage in topology.yml:
   plugin: [ipplan]
@@ -12,6 +13,28 @@ Usage in topology.yml:
 import yaml
 from pathlib import Path
 from box import Box
+
+
+HOST_SH_TEMPLATE = """\
+#!/bin/bash
+# {host_comment} startup configuration — applied by netlab files plugin
+# eth1 connects to {leaf_name} (VLAN {vlan_id} access port — VXLAN overlay)
+# Overlay: VLAN {vlan_id} / VNI {vni} / subnet {subnet}
+
+# Install networking tools (not present in minimal Ubuntu 22.04 image)
+apt-get update -qq > /dev/null 2>&1
+apt-get install -y -qq iproute2 iputils-ping > /dev/null 2>&1
+
+# Wait for interface to be available
+sleep 2
+
+# Assign overlay IP on eth1 (VLAN {vlan_id} subnet)
+ip addr add {overlay_ip} dev eth1 2>/dev/null || true
+ip link set eth1 up
+
+# Loop to keep container alive
+while true; do sleep 60; done
+"""
 
 
 def topology_expand(topology: Box) -> None:
@@ -39,6 +62,7 @@ def topology_expand(topology: Box) -> None:
 
     # Build links list from ip-plan
     links = []
+    host_to_leaf = {}
     for node_name, node_data in ip_plan.items():
         if 'links' not in node_data:
             continue
@@ -54,4 +78,42 @@ def topology_expand(topology: Box) -> None:
             })
             links.append(link_entry)
 
+            if node_name.startswith('leaf') and peer_name.startswith('host'):
+                host_to_leaf[peer_name] = node_name
+
     topology.links = links
+
+    # Process overlay section — generate host*.sh startup scripts
+    overlay = ip_plan.get('overlay')
+    if not overlay:
+        return
+
+    overlay_hosts = overlay.get('hosts', {})
+    vlans = overlay.get('vlans', {})
+
+    # Use the first VLAN entry for overlay metadata
+    vlan_id = None
+    vni = None
+    subnet = None
+    for vid, vlan_data in vlans.items():
+        vlan_id = vid
+        vni = vlan_data.get('vni', '')
+        subnet = vlan_data.get('subnet', '')
+        break
+
+    for host_name, overlay_ip in overlay_hosts.items():
+        leaf_name = host_to_leaf.get(host_name, 'leaf')
+        host_comment = host_name.capitalize()
+
+        content = HOST_SH_TEMPLATE.format(
+            host_comment=host_comment,
+            leaf_name=leaf_name,
+            vlan_id=vlan_id,
+            vni=vni,
+            subnet=subnet,
+            overlay_ip=overlay_ip,
+        )
+
+        sh_path = Path(f'{host_name}.sh')
+        sh_path.write_text(content)
+        print(f"ipplan plugin: generated {sh_path} with overlay IP {overlay_ip}")

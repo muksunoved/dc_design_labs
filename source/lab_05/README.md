@@ -240,10 +240,13 @@ while true; do sleep 60; done
 Все команды запускаются из корня `lab_05/` **без sudo** (требуется membership в группах `docker` и `clab_admins`):
 
 ```shell
-$ make up          # Запустить лабу (контейнеры + конфигурация)
-$ make status      # Проверить статус
-$ make test        # Запустить все тесты
-$ make down        # Остановить лабу
+$ make up            # Запустить лабу (контейнеры + конфигурация)
+$ make status        # Проверить статус
+$ make test          # Функциональные тесты (41 тест)
+$ make test-capture  # Захват пакетов — без disruption (13 тестов)
+$ make test-bounce   # Захват пакетов — с bounce интерфейсов (12 тестов)
+$ make test-all      # Все тесты (каждая группа запускает/останавливает лабу отдельно)
+$ make down          # Остановить лабу
 ```
 
 Полный список команд: `make help`
@@ -384,6 +387,256 @@ PING 192.168.10.12 (192.168.10.12): 56 data bytes
 
 </details>
 
+##### Захват VXLAN-трафика (VTEP-to-VTEP)
+
+При трафике от host1 через overlay, leaf1 инкапсулирует L2 фрейм в VXLAN и отправляет по underlay к удалённым VTEP. Захват на leaf1 показывает структуру пакета:
+
+```bash
+# Запуск захвата VXLAN на leaf1 (все интерфейсы, UDP 4789)
+$ docker exec clab-netlab-leaf1 tcpdump -ni any -c 2 udp port 4789 -vv
+```
+
+<details>
+<summary>Пример вывода tcpdump с разбором пакета</summary>
+
+Реальный захват показывает **Ingress Replication** — leaf1 реплицирует один и тот же inner фрейм (ICMPv6 Router Solicitation от host1) на оба удалённых VTEP:
+
+```
+tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+
+05:48:40.635950 et2 Out aa:c1:ab:19:19:02 ethertype IPv4 (0x0800), length 126:
+    (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 106)
+    10.0.11.1.128 > 10.0.13.1.4789: VXLAN, flags [I] (0x08), vni 10010
+    aa:c1:ab:e3:2a:45 > 33:33:00:00:00:02, ethertype IPv6 (0x86dd), length 70:
+    (hlim 255, next-header ICMPv6 (58) payload length: 16)
+    fe80::a8c1:abff:fee3:2a45 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
+        source link-address option (1), length 8 (1): aa:c1:ab:e3:2a:45
+
+05:48:40.635992 et2 Out aa:c1:ab:19:19:02 ethertype IPv4 (0x0800), length 126:
+    (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto UDP (17), length 106)
+    10.0.11.1.128 > 10.0.12.1.4789: VXLAN, flags [I] (0x08), vni 10010
+    aa:c1:ab:e3:2a:45 > 33:33:00:00:00:02, ethertype IPv6 (0x86dd), length 70:
+    (hlim 255, next-header ICMPv6 (58) payload length: 16)
+    fe80::a8c1:abff:fee3:2a45 > ff02::2: [icmp6 sum ok] ICMP6, router solicitation, length 16
+        source link-address option (1), length 8 (1): aa:c1:ab:e3:2a:45
+```
+
+**Разбор структуры VXLAN-пакета (leaf1 → leaf3):**
+
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│  Outer Ethernet (underlay L2)                                        │
+│  src: aa:c1:ab:19:19:02 (leaf1)  →  dst: spine MAC (next-hop)       │
+│  ethertype: IPv4 (0x0800)                                            │
+├───────────────────────────────────────────────────────────────────────┤
+│  Outer IPv4 (underlay L3)                                            │
+│  src: 10.0.11.1 (leaf1 VTEP)   →   dst: 10.0.13.1 (leaf3 VTEP)     │
+│  tos: 0x0   ttl: 64   id: 0   flags: [DF]   length: 106            │
+│  proto: UDP (17)                                                      │
+├───────────────────────────────────────────────────────────────────────┤
+│  Outer UDP                                                            │
+│  src port: 128 (ephemeral, ECMP hash)  →  dst port: 4789 (VXLAN)   │
+├───────────────────────────────────────────────────────────────────────┤
+│  VXLAN Header (8 bytes)                                               │
+│  flags: [I] (0x08) — I-bit set = VNI valid                           │
+│  vni: 10010 — соответствует VLAN 10 overlay                          │
+├───────────────────────────────────────────────────────────────────────┤
+│  Inner Ethernet (оригинальный L2 фрейм от host1)                     │
+│  src: aa:c1:ab:e3:2a:45 (host1)  →  dst: 33:33:00:00:00:02 (mcast) │
+│  ethertype: IPv6 (0x86dd)                                             │
+├───────────────────────────────────────────────────────────────────────┤
+│  Inner IPv6                                                           │
+│  src: fe80::a8c1:abff:fee3:2a45 (host1 link-local)                  │
+│  dst: ff02::2 (all-routers multicast)                                │
+│  hlim: 255   proto: ICMPv6 (58)                                      │
+├───────────────────────────────────────────────────────────────────────┤
+│  Inner ICMPv6                                                         │
+│  Router Solicitation (type 133)                                       │
+│  source link-address option: aa:c1:ab:e3:2a:45                       │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+**Ingress Replication — два пакета с одинаковым inner, разными outer dst:**
+
+| # | Outer src | Outer dst | Inner payload | Назначение |
+|---|-----------|-----------|---------------|------------|
+| 1 | 10.0.11.1 | **10.0.13.1** (leaf3 VTEP) | RS от host1 | Реплика на leaf3 |
+| 2 | 10.0.11.1 | **10.0.12.1** (leaf2 VTEP) | RS от host1 | Реплика на leaf2 |
+
+Оба пакета содержат идентичный inner фрейм — leaf1 выполнил head-end replication BUM-трафика на все remote VTEP из EVPN Type 3 (IMET) маршрутов.
+
+**Ключевые поля для проверки:**
+
+| Поле | Значение | Назначение |
+|------|----------|------------|
+| Outer src IP | 10.0.11.1 | VTEP leaf1 (source-interface Loopback0) |
+| Outer dst IP | 10.0.12.1 / 10.0.13.1 | VTEP leaf2 / leaf3 (из EVPN IMET) |
+| Outer dst port | 4789 | Стандартный VXLAN UDP port |
+| Outer TTL | 64 | Underlay TTL (не копируется из inner) |
+| VXLAN flags | [I] (0x08) | I-bit установлен — VNI валиден |
+| VNI | 10010 | Overlay идентификатор (VLAN 10 → VNI 10010) |
+| Inner src MAC | aa:c1:ab:e3:2a:45 | MAC host1 (оригинальный отправитель) |
+
+**При unicast ICMP echo (ping host1 → host2) после EVPN MAC learning структура аналогична:**
+
+```
+IP 10.0.11.1 > 10.0.12.1: VXLAN, flags [I] (0x08), vni 10010
+  Inner Ethernet: host1_mac > host2_mac, ethertype IPv4 (0x0800)
+  Inner IPv4: 192.168.10.11 > 192.168.10.12, proto ICMP (1)
+  Inner ICMP: Echo Request, id 1, seq 1
+```
+
+Отличие от BUM — только **один** пакет с outer dst на конкретный VTEP (10.0.12.1), а не репликация на все VTEP.
+
+**Обратный трафик (leaf2 → leaf1, echo reply):**
+
+```
+IP 10.0.12.1 > 10.0.11.1: VXLAN, flags [I] (0x08), vni 10010
+  Inner Ethernet: host2_mac > host1_mac, ethertype IPv4 (0x0800)
+  Inner IPv4: 192.168.10.12 > 192.168.10.11, proto ICMP (1)
+  Inner ICMP: Echo Reply, id 1, seq 1
+```
+
+</details>
+
+##### ARP Suppression — подавление ARP-броадкастов в underlay
+
+При включённом `vxlan learn-restrict any` leaf использует **EVPN control-plane** для изучения MAC-адресов. Когда host1 отправляет ARP-запрос для host2, leaf1 **не форвардит** его в underlay как VXLAN BUM-трафик, а отвечает из EVPN MAC-таблицы (proxy ARP).
+
+```bash
+# 1. Очищаем ARP-кэш host1 и запускаем ping
+$ docker exec clab-netlab-host1 ip neigh flush dev eth1
+$ docker exec clab-netlab-host1 ping -c 2 192.168.10.12
+
+# 2. Захват ARP на host-facing интерфейсе leaf1 (et3)
+$ docker exec clab-netlab-leaf1 tcpdump -ni et3 -c 6 arp -vv
+```
+
+<details>
+<summary>Захват ARP на host-facing (et3) — leaf1 отвечает proxy ARP</summary>
+
+```
+tcpdump: listening on et3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+06:01:10.210085 aa:c1:ab:e5:6b:77 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42:
+    Ethernet (len 6), IPv4 (len 4),
+    Request who-has 192.168.10.12 tell 192.168.10.11, length 28
+
+06:01:10.212675 aa:c1:ab:ca:91:4b > aa:c1:ab:e5:6b:77, ethertype ARP (0x0806), length 60:
+    Ethernet (len 6), IPv4 (len 4),
+    Reply 192.168.10.12 is-at aa:c1:ab:ca:91:4b, length 46
+
+06:01:11.251033 aa:c1:ab:e5:6b:77 > ff:ff:ff:ff:ff:ff, ethertype ARP (0x0806), length 42:
+    Ethernet (len 6), IPv4 (len 4),
+    Request who-has 192.168.10.13 tell 192.168.10.11, length 28
+
+06:01:11.254284 aa:c1:ab:cf:cf:42 > aa:c1:ab:e5:6b:77, ethertype ARP (0x0806), length 60:
+    Ethernet (len 6), IPv4 (len 4),
+    Reply 192.168.10.13 is-at aa:c1:ab:cf:cf:42, length 46
+
+06:01:15.324815 aa:c1:ab:ca:91:4b > aa:c1:ab:e5:6b:77, ethertype ARP (0x0806), length 60:
+    Ethernet (len 6), IPv4 (len 4),
+    Request who-has 192.168.10.11 tell 192.168.10.12, length 46
+
+06:01:15.324827 aa:c1:ab:e5:6b:77 > aa:c1:ab:ca:91:4b, ethertype ARP (0x0806), length 42:
+    Ethernet (len 6), IPv4 (len 4),
+    Reply 192.168.10.11 is-at aa:c1:ab:e5:6b:77, length 28
+
+6 packets captured
+```
+
+</details>
+
+**Разбор ARP exchange (host1 → host2):**
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Шаг 1: host1 отправляет ARP broadcast на et3 (host-facing leaf1)      │
+│                                                                         │
+│  src: aa:c1:ab:e5:6b:77 (host1)  →  dst: ff:ff:ff:ff:ff:ff (broadcast)│
+│  ARP Request: who-has 192.168.10.12 tell 192.168.10.11                │
+│                                                                         │
+│  ⚠ Этот пакет НЕ попадает в underlay — leaf1 перехватывает его        │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Шаг 2: leaf1 отвечает proxy ARP из EVPN MAC table                    │
+│                                                                         │
+│  src: aa:c1:ab:ca:91:4b (host2 MAC из EVPN)                            │
+│  dst: aa:c1:ab:e5:6b:77 (host1)                                        │
+│  ARP Reply: 192.168.10.12 is-at aa:c1:ab:ca:91:4b                     │
+│                                                                         │
+│  ℹ Leaf1 НЕ использует свой MAC — подставляет MAC host2 из EVPN       │
+│    (изучен через Type 2 маршрут от VTEP 10.0.12.1)                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Шаг 3: host1 отправляет ICMP Echo Request напрямую на host2           │
+│  (через VXLAN unicast к VTEP 10.0.12.1 — один пакет, без BUM)         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+<details>
+<summary>Захват ARP на underlay (et1, et2) — 0 пакетов</summary>
+
+```bash
+# Захват ARP на underlay интерфейсах leaf1 (et1, et2)
+$ docker exec clab-netlab-leaf1 tcpdump -ni et1 -c 10 arp -vv -w /tmp/arp_et1.pcap &
+$ docker exec clab-netlab-leaf1 tcpdump -ni et2 -c 10 arp -vv -w /tmp/arp_et2.pcap &
+
+# Flush + ping (ARP suppression)
+$ docker exec clab-netlab-host1 ip neigh flush dev eth1
+$ docker exec clab-netlab-host1 ping -c 2 192.168.10.12
+```
+
+```
+$ docker exec clab-netlab-leaf1 tcpdump -r /tmp/arp_et1.pcap -nn -vv
+reading from file /tmp/arp_et1.pcap, link-type EN10MB (Ethernet)
+tcpdump: truncated dump file; tried to read 4 file header bytes, only got 0
+
+$ docker exec clab-netlab-leaf1 tcpdump -r /tmp/arp_et2.pcap -nn -vv
+reading from file /tmp/arp_et2.pcap, link-type EN10MB (Ethernet)
+tcpdump: truncated dump file; tried to read 4 file header bytes, only got 0
+```
+
+**На underlay интерфейсах — 0 ARP-пакетов.** ARP broadcast от host1 не покидает leaf1.
+
+</details>
+
+<details>
+<summary>EVPN MAC table на leaf1 — подтверждение proxy ARP</summary>
+
+```
+leaf1#show vxlan address-table
+
+          Vxlan Mac Address Table
+----------------------------------------------------------------------
+VLAN  Mac Address     Type      Prt  VTEP             Moves   Last Move
+----  -----------     ----      ---  ----             -----   ---------
+  10  aac1.abca.914b  EVPN      Vx1  10.0.12.1        1       0:02:47 ago
+  10  aac1.abcf.cf42  EVPN      Vx1  10.0.13.1        1       0:02:39 ago
+
+Total Remote Mac Addresses for this criterion: 2
+```
+
+**MAC-адреса хостов изучены через EVPN Type 2 маршруты:**
+
+| MAC-адрес | Хост | VTEP (Type 2 next-hop) |
+|-----------|------|------------------------|
+| `aa:c1:ab:ca:91:4b` | host2 | 10.0.12.1 (leaf2) |
+| `aa:c1:ab:cf:cf:42` | host3 | 10.0.13.1 (leaf3) |
+| `aa:c1:ab:e5:6b:77` | host1 | local (et3) |
+
+Когда host1 запрашивает "who-has 192.168.10.12", leaf1 находит MAC `aa:c1:ab:ca:91:4b` в EVPN-таблице и отвечает ARP Reply с этим MAC — **без обращения к underlay**.
+
+</details>
+
+**Сравнение: без и с ARP suppression**
+
+| | Без `learn-restrict any` | С `learn-restrict any` (эта лаба) |
+|---|---|---|
+| ARP Request от host1 | Инкапсулируется в VXLAN BUM, реплицируется на все remote VTEP | Перехватывается leaf1 |
+| Underlay ARP трафик | VXLAN-инкапсулированный ARP broadcast на et1/et2 | **0 пакетов** на underlay |
+| ARP Reply host2 | Реальный host2 отвечает через VXLAN | Leaf1 отвечает proxy ARP из EVPN MAC table |
+| Задержка | Первый ping: ARP timeout + VXLAN round-trip | Первый ping: мгновенный proxy ARP (~2ms) |
+| Underlay нагрузка | BUM-трафик на каждый ARP | Нет BUM — только unicast VXLAN |
+
 Полученные конфигурации узлов:
 | Ссылка | Содержимое файла  |
 |---|---|
@@ -445,7 +698,9 @@ PYTHONPATH=. PROJECT_DIR=.. robot --outputdir output test_evpn_vxlan.robot
 
 ##### Структура тестов
 
-**`test_evpn_vxlan.robot`** — проверка Underlay + Overlay через `netlab connect`:
+Каждая группа тестов — **самостоятельный suite** с собственным жизненным циклом лабы (запуск/остановка). Перед запуском проверяются rootless-предпосылки (docker, clab_admins, setuid, netlab defaults).
+
+**`test_evpn_vxlan.robot`** (41 тест) — функциональная проверка Underlay + Overlay через `netlab connect`:
 
 | Группа | Что проверяет |
 |--------|---------------|
@@ -455,6 +710,23 @@ PYTHONPATH=. PROJECT_DIR=.. robot --outputdir output test_evpn_vxlan.robot
 | Overlay EVPN | BGP EVPN summary, EVPN route types (Type 2/3) |
 | VXLAN data-plane | VxLAN1 interface, VNI mapping, VTEP list, flood list |
 | Overlay L2 | MAC address table (EVPN), host ping через overlay |
+| Underlay ping | Loopback-to-loopback связность |
+
+**`test_capture.robot`** (13 тестов) — пассивный захват пакетов (без disruption):
+
+| Группа | Что проверяет |
+|--------|---------------|
+| BFD | Захват BFD-пакетов: State Up, interval 100ms, multiplier 3, TTL 255 |
+| LLDP | Захват LLDP-кадров на underlay-линках |
+| BGP | BGP keepalive на underlay |
+| VXLAN | VXLAN-инкапсуляция: UDP 4789, outer IPs (VTEP-to-VTEP), return traffic |
+
+**`test_capture_bounce.robot`** (12 тестов) — захват пакетов с bounce интерфейсов:
+
+| Группа | Что проверяет |
+|--------|---------------|
+| Host link bounce | ARP suppression (learn-restrict any), VXLAN encapsulation, BUM/Ingress Replication, EVPN MAC re-learning, overlay ping recovery |
+| Underlay link bounce | BFD recovery + timers, BGP EVPN recovery, underlay ping recovery |
 
 ##### Автоматизация
 
