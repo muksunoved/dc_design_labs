@@ -1,0 +1,6 @@
+# Generated graph files
+netlab/img/
+netlab/*.styled.dot
+
+# Test outputs
+tests/output/

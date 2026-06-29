@@ -1,0 +1,52 @@
+{# Leaf configuration template for Arista EOS — eBGP underlay + VXLAN EVPN overlay #}
+{# Leaf acts as VTEP: VxLAN1 interface, VLAN access ports, EVPN L2VNI #}
+{# Overlay: VLAN 10 / VNI 10010 / RT 10:10010 #}
+{# RD format: <VTEP_IP>:<VNI> — unique per VTEP per VNI #}
+!
+ip routing
+!
+interface Loopback0
+  ip address {{ loopback.ipv4 }}
+!
+vlan 10
+  name VLAN10_OVERLAY
+!
+interface Vxlan1
+  vxlan source-interface Loopback0
+  vxlan udp-port 4789
+  vxlan vlan 10 vni 10010
+  vxlan learn-restrict any
+!
+{% for iface in interfaces %}
+{% if iface.neighbors[0].node.startswith('host') %}
+interface {{ iface.ifname }}
+  switchport access vlan 10
+  no shutdown
+!
+{% else %}
+interface {{ iface.ifname }}
+  no switchport
+  ip address {{ iface.ipv4 }}
+  no shutdown
+!
+{% endif %}
+{% endfor %}
+router bgp {{ bgp.as }}
+  maximum-paths 4
+{% for neighbor in bgp.neighbors %}
+  neighbor {{ neighbor.ipv4 }} remote-as {{ neighbor.as }}
+  neighbor {{ neighbor.ipv4 }} bfd
+  neighbor {{ neighbor.ipv4 }} send-community extended
+{% endfor %}
+  redistribute connected
+  !
+  vlan 10
+    rd {{ loopback.ipv4.split('/')[0] }}:10010
+    route-target both 10:10010
+    redistribute learned
+  !
+  address-family evpn
+{% for neighbor in bgp.neighbors %}
+    neighbor {{ neighbor.ipv4 }} activate
+{% endfor %}
+!

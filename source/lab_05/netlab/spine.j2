@@ -1,0 +1,30 @@
+{# Spine configuration template for Arista EOS — eBGP underlay + EVPN overlay #}
+{# Spine acts as BGP route reflector for EVPN: preserves original VTEP next-hop #}
+!
+ip routing
+!
+interface Loopback0
+  ip address {{ loopback.ipv4 }}
+!
+{% for iface in interfaces %}
+interface {{ iface.ifname }}
+  no switchport
+  ip address {{ iface.ipv4 }}
+  no shutdown
+!
+{% endfor %}
+router bgp {{ bgp.as }}
+  maximum-paths 4
+{% for neighbor in bgp.neighbors %}
+  neighbor {{ neighbor.ipv4 }} remote-as {{ neighbor.as }}
+  neighbor {{ neighbor.ipv4 }} bfd
+  neighbor {{ neighbor.ipv4 }} send-community extended
+{% endfor %}
+  redistribute connected
+  !
+  address-family evpn
+{% for neighbor in bgp.neighbors %}
+    neighbor {{ neighbor.ipv4 }} activate
+    neighbor {{ neighbor.ipv4 }} next-hop-unchanged
+{% endfor %}
+!
