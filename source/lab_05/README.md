@@ -545,8 +545,6 @@ tcpdump: listening on et3, link-type EN10MB (Ethernet), snapshot length 262144 b
 6 packets captured
 ```
 
-</details>
-
 **Разбор ARP exchange (host1 → host2):**
 
 ```mermaid
@@ -562,6 +560,7 @@ flowchart TD
   style n1 fill:#fff3cd,stroke:#ffc107,color:#000
   style n2 fill:#d1ecf1,stroke:#17a2b8,color:#000
 ```
+</details>
 
 <details>
 <summary>Захват ARP на underlay (et1, et2) — 0 пакетов</summary>
