@@ -5,7 +5,7 @@
 
 ---
 ### План работы:
- - Использовать eBGP Underlay из [lab_04](../lab_04/README.md) для IP-связанности между VTEP.
+ - Использовать eBGP Underlay для IP-связанности между VTEP.
  - Настроить Spine как BGP route reflector для EVPN (с сохранением next-hop VTEP).
  - Настроить Leaf как VTEP: VxLAN1 интерфейс, VLAN access ports, EVPN L2VNI.
  - Перевести хост-линки Leaf из routed (P2P) в switched (VLAN access).
@@ -18,7 +18,7 @@
 
 #### Архитектура Overlay
 
-**Underlay:** eBGP IPv4 Unicast (из lab_04) — обеспечивает IP-связность между VTEP (Loopback0).
+**Underlay:** eBGP IPv4 Unicast — обеспечивает IP-связность между VTEP (Loopback0).
 
 **Overlay:** BGP EVPN (AFI 25 / SAFI 70) — control-plane для MAC/IP advertisement.
 
@@ -52,7 +52,7 @@
 | host2 | leaf2 | 10 | 192.168.10.12/24 |
 | host3 | leaf3 | 10 | 192.168.10.13/24 |
 
-Распределение адресного пространства underlay выполнено как в [lab_01](../lab_01/README.md):
+Распределение адресного пространства underlay:
 <details>
 <summary>Используем рекомендованную схему ЦОД (2).</summary>
 
@@ -172,7 +172,7 @@ router bgp 65101
 
 #### Конфигурация хостов
 
-Хосты получают overlay IP в VLAN 10 subnet вместо P2P IP из lab_04:
+Хосты получают overlay IP в VLAN 10 subnet:
 
 <details>
 <summary>host1.sh</summary>
@@ -207,7 +207,7 @@ while true; do sleep 60; done
 
 **Оборудование:** Arista cEOS 4.34.2.2F (containerlab), Ubuntu 22.04 (хосты)
 
-**Underlay параметры (как в lab_04):**
+**Underlay параметры:**
 - eBGP IPv4 Unicast между spine и leaf
 - Уникальный ASN на каждом узле
 - Maximum-paths 4 (ECMP)
@@ -423,37 +423,37 @@ tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot leng
 
 **Разбор структуры VXLAN-пакета (leaf1 → leaf3):**
 
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│  Outer Ethernet (underlay L2)                                        │
-│  src: aa:c1:ab:19:19:02 (leaf1)  →  dst: spine MAC (next-hop)       │
-│  ethertype: IPv4 (0x0800)                                            │
-├───────────────────────────────────────────────────────────────────────┤
-│  Outer IPv4 (underlay L3)                                            │
-│  src: 10.0.11.1 (leaf1 VTEP)   →   dst: 10.0.13.1 (leaf3 VTEP)     │
-│  tos: 0x0   ttl: 64   id: 0   flags: [DF]   length: 106            │
-│  proto: UDP (17)                                                      │
-├───────────────────────────────────────────────────────────────────────┤
-│  Outer UDP                                                            │
-│  src port: 128 (ephemeral, ECMP hash)  →  dst port: 4789 (VXLAN)   │
-├───────────────────────────────────────────────────────────────────────┤
-│  VXLAN Header (8 bytes)                                               │
-│  flags: [I] (0x08) — I-bit set = VNI valid                           │
-│  vni: 10010 — соответствует VLAN 10 overlay                          │
-├───────────────────────────────────────────────────────────────────────┤
-│  Inner Ethernet (оригинальный L2 фрейм от host1)                     │
-│  src: aa:c1:ab:e3:2a:45 (host1)  →  dst: 33:33:00:00:00:02 (mcast) │
-│  ethertype: IPv6 (0x86dd)                                             │
-├───────────────────────────────────────────────────────────────────────┤
-│  Inner IPv6                                                           │
-│  src: fe80::a8c1:abff:fee3:2a45 (host1 link-local)                  │
-│  dst: ff02::2 (all-routers multicast)                                │
-│  hlim: 255   proto: ICMPv6 (58)                                      │
-├───────────────────────────────────────────────────────────────────────┤
-│  Inner ICMPv6                                                         │
-│  Router Solicitation (type 133)                                       │
-│  source link-address option: aa:c1:ab:e3:2a:45                       │
-└───────────────────────────────────────────────────────────────────────┘
+```mermaid
+block-beta
+  columns 1
+  block:outer_eth:1
+    h1["Outer Ethernet (underlay L2)"]
+    d1["src: aa:c1:ab:19:19:02 (leaf1) → dst: spine MAC (next-hop)<br/>ethertype: IPv4 (0x0800)"]
+  end
+  block:outer_ipv4:1
+    h2["Outer IPv4 (underlay L3)"]
+    d2["src: 10.0.11.1 (leaf1 VTEP) → dst: 10.0.13.1 (leaf3 VTEP)<br/>tos: 0x0 | ttl: 64 | id: 0 | flags: [DF] | length: 106<br/>proto: UDP (17)"]
+  end
+  block:outer_udp:1
+    h3["Outer UDP"]
+    d3["src port: 128 (ephemeral, ECMP hash) → dst port: 4789 (VXLAN)"]
+  end
+  block:vxlan_hdr:1
+    h4["VXLAN Header (8 bytes)"]
+    d4["flags: [I] (0x08) — I-bit set = VNI valid<br/>vni: 10010 — соответствует VLAN 10 overlay"]
+  end
+  block:inner_eth:1
+    h5["Inner Ethernet (оригинальный L2 фрейм от host1)"]
+    d5["src: aa:c1:ab:e3:2a:45 (host1) → dst: 33:33:00:00:00:02 (mcast)<br/>ethertype: IPv6 (0x86dd)"]
+  end
+  block:inner_ipv6:1
+    h6["Inner IPv6"]
+    d6["src: fe80::a8c1:abff:fee3:2a45 (host1 link-local)<br/>dst: ff02::2 (all-routers multicast)<br/>hlim: 255 | proto: ICMPv6 (58)"]
+  end
+  block:inner_icmpv6:1
+    h7["Inner ICMPv6"]
+    d7["Router Solicitation (type 133)<br/>source link-address option: aa:c1:ab:e3:2a:45"]
+  end
 ```
 
 **Ingress Replication — два пакета с одинаковым inner, разными outer dst:**
@@ -469,13 +469,13 @@ tcpdump: listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot leng
 
 | Поле | Значение | Назначение |
 |------|----------|------------|
-| Outer src IP | 10.0.11.1 | VTEP leaf1 (source-interface Loopback0) |
-| Outer dst IP | 10.0.12.1 / 10.0.13.1 | VTEP leaf2 / leaf3 (из EVPN IMET) |
-| Outer dst port | 4789 | Стандартный VXLAN UDP port |
-| Outer TTL | 64 | Underlay TTL (не копируется из inner) |
-| VXLAN flags | [I] (0x08) | I-bit установлен — VNI валиден |
-| VNI | 10010 | Overlay идентификатор (VLAN 10 → VNI 10010) |
-| Inner src MAC | aa:c1:ab:e3:2a:45 | MAC host1 (оригинальный отправитель) |
+| Outer src IP | `10.0.11.1` | VTEP leaf1 (source-interface Loopback0) |
+| Outer dst IP | `10.0.12.1 / 10.0.13.1` | VTEP leaf2 / leaf3 (из EVPN IMET) |
+| Outer dst port | `4789` | Стандартный VXLAN UDP port |
+| Outer TTL | `64` | Underlay TTL (не копируется из inner) |
+| VXLAN flags | `[I] (0x08)` | I-bit установлен — VNI валиден |
+| VNI | `10010` | Overlay идентификатор (VLAN 10 → VNI 10010) |
+| Inner src MAC | `aa:c1:ab:e3:2a:45` | MAC host1 (оригинальный отправитель) |
 
 **При unicast ICMP echo (ping host1 → host2) после EVPN MAC learning структура аналогична:**
 
@@ -549,27 +549,18 @@ tcpdump: listening on et3, link-type EN10MB (Ethernet), snapshot length 262144 b
 
 **Разбор ARP exchange (host1 → host2):**
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Шаг 1: host1 отправляет ARP broadcast на et3 (host-facing leaf1)      │
-│                                                                         │
-│  src: aa:c1:ab:e5:6b:77 (host1)  →  dst: ff:ff:ff:ff:ff:ff (broadcast)│
-│  ARP Request: who-has 192.168.10.12 tell 192.168.10.11                │
-│                                                                         │
-│  ⚠ Этот пакет НЕ попадает в underlay — leaf1 перехватывает его        │
-├─────────────────────────────────────────────────────────────────────────┤
-│  Шаг 2: leaf1 отвечает proxy ARP из EVPN MAC table                    │
-│                                                                         │
-│  src: aa:c1:ab:ca:91:4b (host2 MAC из EVPN)                            │
-│  dst: aa:c1:ab:e5:6b:77 (host1)                                        │
-│  ARP Reply: 192.168.10.12 is-at aa:c1:ab:ca:91:4b                     │
-│                                                                         │
-│  ℹ Leaf1 НЕ использует свой MAC — подставляет MAC host2 из EVPN       │
-│    (изучен через Type 2 маршрут от VTEP 10.0.12.1)                     │
-├─────────────────────────────────────────────────────────────────────────┤
-│  Шаг 3: host1 отправляет ICMP Echo Request напрямую на host2           │
-│  (через VXLAN unicast к VTEP 10.0.12.1 — один пакет, без BUM)         │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  s1["<b>Шаг 1: host1 → ARP broadcast на et3 (host-facing leaf1)</b><br/><br/>src: aa:c1:ab:e5:6b:77 (host1) → dst: ff:ff:ff:ff:ff:ff (broadcast)<br/>ARP Request: who-has 192.168.10.12 tell 192.168.10.11"]
+  n1["⚠ Этот пакет НЕ попадает в underlay — leaf1 перехватывает его"]
+  s2["<b>Шаг 2: leaf1 → proxy ARP из EVPN MAC table</b><br/><br/>src: aa:c1:ab:ca:91:4b (host2 MAC из EVPN)<br/>dst: aa:c1:ab:e5:6b:77 (host1)<br/>ARP Reply: 192.168.10.12 is-at aa:c1:ab:ca:91:4b"]
+  n2["ℹ Leaf1 НЕ использует свой MAC — подставляет MAC host2 из EVPN<br/>(изучен через Type 2 маршрут от VTEP 10.0.12.1)"]
+  s3["<b>Шаг 3: host1 → ICMP Echo Request напрямую на host2</b><br/>(через VXLAN unicast к VTEP 10.0.12.1 — один пакет, без BUM)"]
+
+  s1 --> n1 --> s2 --> n2 --> s3
+
+  style n1 fill:#fff3cd,stroke:#ffc107,color:#000
+  style n2 fill:#d1ecf1,stroke:#17a2b8,color:#000
 ```
 
 <details>
