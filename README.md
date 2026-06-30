@@ -7,6 +7,7 @@
 - [Практическая работа 3 - Underlay IS-IS](source/lab_03/README.md)
 - [Практическая работа 4 - Underlay eBGP](source/lab_04/README.md)
 - [Практическая работа 5 - Overlay VxLAN EVPN для L2 связанности](source/lab_05/README.md)
+- [Проектная работа - Проектирование L3 сети ЦОД без внедрения L2 (2 ЦОД)](source/final_project/README.md)
 
 ---
 
